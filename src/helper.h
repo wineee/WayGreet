@@ -7,6 +7,7 @@
 #include "backend.h"
 #include "powermanager.h"
 #include "sessionmodel.h"
+#include "usermodel.h"
 
 #include <wglobal.h>
 #include <wqmlcreator.h>
@@ -14,10 +15,6 @@
 
 #include <QObject>
 #include <QQmlApplicationEngine>
-
-QT_BEGIN_NAMESPACE
-class QQuickItem;
-QT_END_NAMESPACE
 
 WAYLIB_SERVER_BEGIN_NAMESPACE
 class WServer;
@@ -48,6 +45,7 @@ class Helper : public WSeatEventFilter
     Q_OBJECT
     Q_PROPERTY(OutputMode outputMode READ outputMode WRITE setOutputMode NOTIFY outputModeChanged FINAL)
     Q_PROPERTY(SessionModel *sessionModel READ sessionModel CONSTANT)
+    Q_PROPERTY(UserModel *userModel READ userModel CONSTANT)
     QML_ELEMENT
     QML_SINGLETON
 
@@ -64,6 +62,7 @@ public:
     static Helper *instance();
 
     SessionModel *sessionModel() const;
+    UserModel *userModel() const;
     QmlEngine *qmlEngine() const;
     WOutputRenderWindow *window() const;
     Output* output() const;
@@ -97,6 +96,7 @@ private:
     Backend *m_greetd = nullptr;
     PowerManager *m_powerManager = nullptr;
     SessionModel *m_sessionModel = nullptr;
+    UserModel *m_userModel = nullptr;
 
     // qtquick helper
     WOutputRenderWindow *m_renderWindow = nullptr;

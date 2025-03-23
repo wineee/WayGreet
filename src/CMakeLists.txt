@@ -39,6 +39,7 @@ qt_add_qml_module(${TARGET}
         powermanager.h powermanager.cpp
         sessiontype.h sessiontype.cpp
         sessionmodel.h sessionmodel.cpp
+        usermodel.h usermodel.cpp
 
     QML_FILES PrimaryOutput.qml
     QML_FILES CopyOutput.qml

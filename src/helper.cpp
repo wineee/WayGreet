@@ -40,9 +40,10 @@
 Helper *Helper::m_instance = nullptr;
 Helper::Helper(QObject *parent)
     : WSeatEventFilter(parent)
-    , m_greetd(new Backend)
-    , m_powerManager(new PowerManager)
-    , m_sessionModel(new SessionModel)
+    , m_greetd(new Backend(this))
+    , m_powerManager(new PowerManager(this))
+    , m_sessionModel(new SessionModel(this))
+    , m_userModel(new UserModel(true, this))
     , m_renderWindow(new WOutputRenderWindow(this))
     , m_server(new WServer(this))
     , m_surfaceContainer(new RootSurfaceContainer(m_renderWindow->contentItem()))
@@ -72,6 +73,11 @@ Helper *Helper::instance()
 SessionModel *Helper::sessionModel() const
 {
     return m_sessionModel;
+}
+
+UserModel *Helper::userModel() const
+{
+    return m_userModel;
 }
 
 QmlEngine *Helper::qmlEngine() const

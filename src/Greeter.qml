@@ -39,19 +39,6 @@ Item {
         source: "file:///home/rewine/pic/desktop.png" // TODO: use config
     }
 
-    ListModel {
-        id: userModel
-        ListElement {
-            name: "testuser1"
-            realName: "1111"
-        }
-
-        ListElement {
-            name: "testuser2"
-            realName: "2222"
-        }
-    }
-
     Column {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
@@ -59,8 +46,8 @@ Item {
 
         SimpleComboBox {
             id: user_entry
-            model: userModel
-            // currentIndex: userModel.lastIndex
+            model: Helper.userModel
+            currentIndex: Helper.userModel.lastIndex
             textRole: "realName"
             width: 250
             KeyNavigation.backtab: session
