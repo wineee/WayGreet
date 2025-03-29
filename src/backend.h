@@ -10,7 +10,6 @@ class Backend : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QUrl iconsSrc READ iconsSrc CONSTANT)
-    Q_PROPERTY(QUrl backgroundSrc READ backgroundSrc CONSTANT)
     Q_PROPERTY(bool sessionInProgress READ sessionInProgress NOTIFY sessionInProgressChanged)
 
 public:
@@ -18,9 +17,6 @@ public:
 
     QUrl iconsSrc() const;
     void setIconsSrc(const QUrl &url);
-
-    QUrl backgroundSrc() const;
-    void setBackgroundSrc(const QUrl &url);
 
     bool sessionInProgress() const;
 
@@ -41,7 +37,6 @@ Q_SIGNALS:
 
 private:
     QUrl m_iconsSrc;
-    QUrl m_backgroundSrc;
     QString m_command;
     Ipc *m_ipc = nullptr;
     Session *m_session = nullptr;

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 #include "helper.h"
+#include "wayconfig.h"
 
 #include <wrenderhelper.h>
 #include <qwbuffer.h>
@@ -34,7 +35,10 @@ int main(int argc, char *argv[]) {
             qApp->exit(code);
         });
 
-        Helper *helper = qmlEngine.singletonInstance<Helper*>("WayGreet", "Helper");
+        auto config = qmlEngine.singletonInstance<WayConfig*>("WayGreet", "WayConfig");
+        Q_ASSERT(config);
+
+        auto helper = qmlEngine.singletonInstance<Helper*>("WayGreet", "Helper");
         helper->init();
 
         quitCode = app.exec();

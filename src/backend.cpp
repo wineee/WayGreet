@@ -21,16 +21,6 @@ void Backend::setIconsSrc(const QUrl &url)
     m_iconsSrc = url;
 }
 
-QUrl Backend::backgroundSrc() const
-{
-    return m_backgroundSrc;
-}
-
-void Backend::setBackgroundSrc(const QUrl &url)
-{
-    m_backgroundSrc = url;
-}
-
 bool Backend::sessionInProgress() const
 {
     return m_session;

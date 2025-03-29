@@ -40,7 +40,7 @@ qt_add_qml_module(${TARGET}
         sessiontype.h sessiontype.cpp
         sessionmodel.h sessionmodel.cpp
         usermodel.h usermodel.cpp
-
+        wayconfig.h wayconfig.cpp
     QML_FILES PrimaryOutput.qml
     QML_FILES CopyOutput.qml
     QML_FILES SurfaceContent.qml

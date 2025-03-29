@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import WayGreet
 
 Item {
     id: root
@@ -36,7 +37,7 @@ Item {
 
     Image {
         anchors.fill: parent
-        source: "file:///home/rewine/pic/desktop.png" // TODO: use config
+        source: WayConfig.background
     }
 
     Column {
