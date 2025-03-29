@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QQmlEngine>
 #include <QSettings>
+#include <QSize>
 
 class WayConfig : public QObject
 {
@@ -12,12 +13,17 @@ class WayConfig : public QObject
     QML_SINGLETON
 
     Q_PROPERTY(QUrl background READ background CONSTANT)
+    Q_PROPERTY(QString cursorTheme READ cursorTheme CONSTANT)
+    Q_PROPERTY(QSize cursorSize READ cursorSize CONSTANT)
 
 public:
     explicit WayConfig(QObject *parent = nullptr);
     static WayConfig *instance();
 
     QUrl background() const;
+
+    QString cursorTheme() const;
+    QSize cursorSize() const;
 
     bool showX11Session() const;
     QStringList waylandSessionDir() const;

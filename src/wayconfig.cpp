@@ -24,6 +24,16 @@ QUrl WayConfig::background() const
     return QUrl::fromLocalFile(path);
 }
 
+QString WayConfig::cursorTheme() const
+{
+    return m_config->value("cursorTheme", "default").toString();
+}
+
+QSize WayConfig::cursorSize() const
+{
+    return m_config->value("cursorSize", QSize(24, 24)).toSize();
+}
+
 bool WayConfig::showX11Session() const
 {
     return m_config->value("showX11Session", false).toBool();

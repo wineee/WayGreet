@@ -29,6 +29,9 @@ OutputItem {
         OutputLayer.outputs: [screenViewport]
         OutputLayer.flags: OutputLayer.Cursor
         OutputLayer.cursorHotSpot: hotSpot
+
+        themeName: WayConfig.cursorTheme
+        sourceSize: WayConfig.cursorSize
     }
 
     OutputViewport {
