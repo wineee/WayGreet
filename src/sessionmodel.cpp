@@ -19,26 +19,32 @@
  ***************************************************************************/
 
 #include "sessionmodel.h"
+
 #include "wayconfig.h"
 
 #include <QFileInfo>
-#include <QVector>
-#include <QProcessEnvironment>
 #include <QFileSystemWatcher>
+#include <QProcessEnvironment>
+#include <QVector>
 
-class SessionModelPrivate {
+class SessionModelPrivate
+{
 public:
-    ~SessionModelPrivate() {
+    ~SessionModelPrivate()
+    {
         qDeleteAll(sessions);
         sessions.clear();
     }
 
-    int lastIndex { 0 };
+    int lastIndex{ 0 };
     QStringList displayNames;
     QVector<WSession *> sessions;
 };
 
-SessionModel::SessionModel(QObject *parent) : QAbstractListModel(parent), d(new SessionModelPrivate()) {
+SessionModel::SessionModel(QObject *parent)
+    : QAbstractListModel(parent)
+    , d(new SessionModelPrivate())
+{
     // initial population
     beginResetModel();
     populate(WSession::WaylandSession, WayConfig::instance()->waylandSessionDir());
@@ -46,7 +52,7 @@ SessionModel::SessionModel(QObject *parent) : QAbstractListModel(parent), d(new 
         populate(WSession::X11Session, WayConfig::instance()->x11SessionDir());
     endResetModel();
 
-   // refresh everytime a file is changed, added or removed
+    // refresh everytime a file is changed, added or removed
     QFileSystemWatcher *watcher = new QFileSystemWatcher(this);
     connect(watcher, &QFileSystemWatcher::directoryChanged, [this]() {
         // Recheck for flag to show Wayland sessions
@@ -63,11 +69,13 @@ SessionModel::SessionModel(QObject *parent) : QAbstractListModel(parent), d(new 
         watcher->addPaths(WayConfig::instance()->x11SessionDir());
 }
 
-SessionModel::~SessionModel() {
+SessionModel::~SessionModel()
+{
     delete d;
 }
 
-QHash<int, QByteArray> SessionModel::roleNames() const {
+QHash<int, QByteArray> SessionModel::roleNames() const
+{
     // set role names
     QHash<int, QByteArray> roleNames;
     roleNames[DirectoryRole] = QByteArrayLiteral("directory");
@@ -80,22 +88,26 @@ QHash<int, QByteArray> SessionModel::roleNames() const {
     return roleNames;
 }
 
-int SessionModel::lastIndex() const {
+int SessionModel::lastIndex() const
+{
     return d->lastIndex;
 }
 
-void SessionModel::setLastIndex(int index) {
+void SessionModel::setLastIndex(int index)
+{
     if (index < 0 || index >= d->sessions.length())
         return;
     const auto *session = d->sessions[index];
     WayConfig::instance()->setLastSession(session->fileName());
 }
 
-int SessionModel::rowCount(const QModelIndex &parent) const {
+int SessionModel::rowCount(const QModelIndex &parent) const
+{
     return parent.isValid() ? 0 : d->sessions.length();
 }
 
-QVariant SessionModel::data(const QModelIndex &index, int role) const {
+QVariant SessionModel::data(const QModelIndex &index, int role) const
+{
     if (!checkIndex(index))
         return QVariant();
 
@@ -111,7 +123,8 @@ QVariant SessionModel::data(const QModelIndex &index, int role) const {
     case TypeRole:
         return session->type();
     case NameRole:
-        if (d->displayNames.count(session->displayName()) > 1 && session->type() == WSession::WaylandSession)
+        if (d->displayNames.count(session->displayName()) > 1
+            && session->type() == WSession::WaylandSession)
             return tr("%1 (Wayland)").arg(session->displayName());
         return session->displayName();
     case ExecRole:
@@ -126,10 +139,11 @@ QVariant SessionModel::data(const QModelIndex &index, int role) const {
     return QVariant();
 }
 
-void SessionModel::populate(WSession::Type type, const QStringList &dirPaths) {
+void SessionModel::populate(WSession::Type type, const QStringList &dirPaths)
+{
     // read session files
     QStringList sessions;
-    for (const auto &path: dirPaths) {
+    for (const auto &path : dirPaths) {
         QDir dir = path;
         dir.setNameFilters(QStringList() << QStringLiteral("*.desktop"));
         dir.setFilter(QDir::Files);
@@ -137,7 +151,7 @@ void SessionModel::populate(WSession::Type type, const QStringList &dirPaths) {
     }
     // read session
     sessions.removeDuplicates();
-    for (auto&& session : std::as_const(sessions)) {
+    for (auto &&session : std::as_const(sessions)) {
         qDebug() << "Found Session: " << sessions;
         auto *si = new WSession(type, session);
         bool execAllowed = true;
@@ -150,7 +164,7 @@ void SessionModel::populate(WSession::Type type, const QStringList &dirPaths) {
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
             QString envPath = env.value(QStringLiteral("PATH"));
             const QStringList pathList = envPath.split(QLatin1Char(':'));
-            for(const QString &path : pathList) {
+            for (const QString &path : pathList) {
                 QDir pathDir(path);
                 fi.setFile(pathDir, si->tryExec());
                 if (fi.exists() && fi.isExecutable()) {

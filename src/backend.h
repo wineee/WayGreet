@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QUrl>
 #include <QObject>
+#include <QUrl>
 
 class Ipc;
 class Session;

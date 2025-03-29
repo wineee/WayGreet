@@ -3,9 +3,9 @@
 
 #pragma once
 
-#include "qmlengine.h"
 #include "backend.h"
 #include "powermanager.h"
+#include "qmlengine.h"
 #include "sessionmodel.h"
 #include "usermodel.h"
 
@@ -39,6 +39,7 @@ QW_USE_NAMESPACE
 
 class RootSurfaceContainer;
 class Output;
+
 class Helper : public WSeatEventFilter
 {
     friend class RootSurfaceContainer;
@@ -53,10 +54,7 @@ public:
     explicit Helper(QObject *parent = nullptr);
     ~Helper();
 
-    enum class OutputMode {
-        Copy,
-        Extension
-    };
+    enum class OutputMode { Copy, Extension };
     Q_ENUM(OutputMode)
 
     static Helper *instance();
@@ -65,7 +63,7 @@ public:
     UserModel *userModel() const;
     QmlEngine *qmlEngine() const;
     WOutputRenderWindow *window() const;
-    Output* output() const;
+    Output *output() const;
     void init();
 
     Output *getOutput(WOutput *output) const;
@@ -88,7 +86,11 @@ private:
     void setCursorPosition(const QPointF &position);
 
     bool beforeDisposeEvent(WSeat *seat, QWindow *watched, QInputEvent *event) override;
-    bool afterHandleEvent(WSeat *seat, WSurface *watched, QObject *surfaceItem, QObject *, QInputEvent *event) override;
+    bool afterHandleEvent(WSeat *seat,
+                          WSurface *watched,
+                          QObject *surfaceItem,
+                          QObject *,
+                          QInputEvent *event) override;
 
     static Helper *m_instance;
 
@@ -109,10 +111,10 @@ private:
     qw_allocator *m_allocator = nullptr;
 
     // privaet data
-    QList<Output*> m_outputList;
+    QList<Output *> m_outputList;
 
     RootSurfaceContainer *m_surfaceContainer = nullptr;
     OutputMode m_mode = OutputMode::Extension;
 };
 
-Q_DECLARE_OPAQUE_POINTER(RootSurfaceContainer*)
+Q_DECLARE_OPAQUE_POINTER(RootSurfaceContainer *)

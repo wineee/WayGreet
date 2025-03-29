@@ -3,10 +3,10 @@
 
 #pragma once
 
+#include <wglobal.h>
+
 #include <QQmlApplicationEngine>
 #include <QQmlComponent>
-
-#include <wglobal.h>
 
 QT_BEGIN_NAMESPACE
 class QQuickItem;

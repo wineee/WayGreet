@@ -3,7 +3,9 @@
 #pragma once
 
 #include "output.h"
+
 #include <wglobal.h>
+
 #include <QQuickItem>
 
 WAYLIB_SERVER_BEGIN_NAMESPACE
@@ -33,7 +35,7 @@ public:
     Output *cursorOutput() const;
     Output *primaryOutput() const;
     void setPrimaryOutput(Output *newPrimaryOutput);
-    const QList<Output*> &outputs() const;
+    const QList<Output *> &outputs() const;
 
     void addOutput(Output *output);
     void removeOutput(Output *output);
@@ -50,5 +52,5 @@ private:
     WCursor *m_cursor = nullptr;
 };
 
-Q_DECLARE_OPAQUE_POINTER(WAYLIB_SERVER_NAMESPACE::WOutputLayout*)
-Q_DECLARE_OPAQUE_POINTER(WAYLIB_SERVER_NAMESPACE::WCursor*)
+Q_DECLARE_OPAQUE_POINTER(WAYLIB_SERVER_NAMESPACE::WOutputLayout *)
+Q_DECLARE_OPAQUE_POINTER(WAYLIB_SERVER_NAMESPACE::WCursor *)

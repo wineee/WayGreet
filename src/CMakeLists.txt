@@ -43,7 +43,6 @@ qt_add_qml_module(${TARGET}
         wayconfig.h wayconfig.cpp
     QML_FILES PrimaryOutput.qml
     QML_FILES CopyOutput.qml
-    QML_FILES SurfaceContent.qml
     QML_FILES OutputMenuBar.qml
     QML_FILES Greeter.qml SimpleButton.qml SimpleComboBox.qml
 )

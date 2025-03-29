@@ -1,4 +1,5 @@
 #include "backend.h"
+
 #include "ipc.h"
 #include "session.h"
 
@@ -51,12 +52,15 @@ bool Backend::login(const QString &user, const QString &password)
         Q_EMIT sessionInProgressChanged();
     });
 
-    connect(m_session, &Session::error, this, [this](const QString &errorType, const QString &description) {
-        qDebug() << "Error" << errorType << description;
-        m_session = nullptr;
-        Q_EMIT sessionError(errorType, description);
-        Q_EMIT sessionInProgressChanged();
-    });
+    connect(m_session,
+            &Session::error,
+            this,
+            [this](const QString &errorType, const QString &description) {
+                qDebug() << "Error" << errorType << description;
+                m_session = nullptr;
+                Q_EMIT sessionError(errorType, description);
+                Q_EMIT sessionInProgressChanged();
+            });
 
     connect(m_session, &Session::infoMessage, this, &Backend::infoMessage);
     connect(m_session, &Session::errorMessage, this, &Backend::errorMessage);

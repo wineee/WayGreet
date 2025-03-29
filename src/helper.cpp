@@ -2,42 +2,43 @@
 // SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 #include "helper.h"
+
 #include "output.h"
 #include "qmlengine.h"
 #include "rootsurfacecontainer.h"
 
-#include <WServer>
-#include <WOutput>
-#include <wrenderhelper.h>
 #include <WBackend>
-#include <woutputitem.h>
-#include <wquickcursor.h>
-#include <woutputrenderwindow.h>
-#include <woutputmanagerv1.h>
+#include <WOutput>
+#include <WServer>
 #include <woutputitem.h>
 #include <woutputlayout.h>
+#include <woutputmanagerv1.h>
+#include <woutputrenderwindow.h>
 #include <woutputviewport.h>
+#include <wquickcursor.h>
+#include <wrenderhelper.h>
 #include <wseat.h>
 
-#include <qwdisplay.h>
-#include <qwoutput.h>
-#include <qwlogging.h>
 #include <qwallocator.h>
+#include <qwdisplay.h>
+#include <qwlogging.h>
+#include <qwoutput.h>
 #include <qwrenderer.h>
 
 #include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
+#include <QKeySequence>
+#include <QLoggingCategory>
 #include <QMouseEvent>
+#include <QQmlApplicationEngine>
+#include <QQmlComponent>
+#include <QQmlContext>
 #include <QQuickItem>
 #include <QQuickWindow>
-#include <QLoggingCategory>
-#include <QKeySequence>
-#include <QQmlComponent>
 
 #define WLR_FRACTIONAL_SCALE_V1_VERSION 1
 
 Helper *Helper::m_instance = nullptr;
+
 Helper::Helper(QObject *parent)
     : WSeatEventFilter(parent)
     , m_greetd(new Backend(this))
@@ -82,7 +83,7 @@ UserModel *Helper::userModel() const
 
 QmlEngine *Helper::qmlEngine() const
 {
-    return qobject_cast<QmlEngine*>(::qmlEngine(this));
+    return qobject_cast<QmlEngine *>(::qmlEngine(this));
 }
 
 WOutputRenderWindow *Helper::window() const
@@ -95,7 +96,7 @@ void Helper::init()
     auto engine = qmlEngine();
     engine->setContextForObject(m_renderWindow, engine->rootContext());
     engine->setContextForObject(m_renderWindow->contentItem(), engine->rootContext());
-    //m_surfaceContainer->setQmlEngine(engine);
+    // m_surfaceContainer->setQmlEngine(engine);
     engine->rootContext()->setContextProperty("Greetd", m_greetd);
     engine->rootContext()->setContextProperty("WayPowerManager", m_powerManager);
 
@@ -106,15 +107,15 @@ void Helper::init()
     m_seat->setKeyboardFocusWindow(m_renderWindow);
 
     m_backend = m_server->attach<WBackend>();
-    connect(m_backend, &WBackend::inputAdded, this, [this] (WInputDevice *device) {
+    connect(m_backend, &WBackend::inputAdded, this, [this](WInputDevice *device) {
         m_seat->attachInputDevice(device);
     });
 
-    connect(m_backend, &WBackend::inputRemoved, this, [this] (WInputDevice *device) {
+    connect(m_backend, &WBackend::inputRemoved, this, [this](WInputDevice *device) {
         m_seat->detachInputDevice(device);
     });
 
-    connect(m_backend, &WBackend::outputAdded, this, [this] (WOutput *output) {
+    connect(m_backend, &WBackend::outputAdded, this, [this](WOutput *output) {
         allowNonDrmOutputAutoChangeMode(output);
         Output *o;
         if (m_mode == OutputMode::Extension || !m_surfaceContainer->primaryOutput()) {
@@ -129,7 +130,7 @@ void Helper::init()
         enableOutput(output);
     });
 
-    connect(m_backend, &WBackend::outputRemoved, this, [this] (WOutput *output) {
+    connect(m_backend, &WBackend::outputRemoved, this, [this](WOutput *output) {
         auto index = indexOfOutput(output);
         Q_ASSERT(index >= 0);
         const auto o = m_outputList.takeAt(index);
@@ -154,7 +155,7 @@ void Helper::init()
 bool Helper::beforeDisposeEvent(WSeat *seat, QWindow *, QInputEvent *event)
 {
     if (event->type() == QEvent::KeyPress) {
-        auto kevent = static_cast<QKeyEvent*>(event);
+        auto kevent = static_cast<QKeyEvent *>(event);
         if (QKeySequence(kevent->keyCombination()) == QKeySequence::Quit) {
             qApp->quit();
             return true;
@@ -170,7 +171,8 @@ bool Helper::beforeDisposeEvent(WSeat *seat, QWindow *, QInputEvent *event)
     return false;
 }
 
-bool Helper::afterHandleEvent(WSeat *seat, WSurface *watched, QObject *surfaceItem, QObject *, QInputEvent *event)
+bool Helper::afterHandleEvent(
+    WSeat *seat, WSurface *watched, QObject *surfaceItem, QObject *, QInputEvent *event)
 {
     Q_UNUSED(seat)
 
@@ -185,12 +187,13 @@ void Helper::setCursorPosition(const QPointF &position)
 void Helper::allowNonDrmOutputAutoChangeMode(WOutput *output)
 {
     output->safeConnect(&qw_output::notify_request_state,
-        this, [this] (wlr_output_event_request_state *newState) {
-        if (newState->state->committed & WLR_OUTPUT_STATE_MODE) {
-            auto output = qobject_cast<qw_output*>(sender());
-            output->commit_state(newState->state);
-        }
-    });
+                        this,
+                        [this](wlr_output_event_request_state *newState) {
+                            if (newState->state->committed & WLR_OUTPUT_STATE_MODE) {
+                                auto output = qobject_cast<qw_output *>(sender());
+                                output->commit_state(newState->state);
+                            }
+                        });
 }
 
 void Helper::enableOutput(WOutput *output)
@@ -237,13 +240,16 @@ Output *Helper::getOutput(WOutput *output) const
 
 void Helper::addOutput()
 {
-    qobject_cast<qw_multi_backend*>(m_backend->handle())->for_each_backend([] (wlr_backend *backend, void *) {
-        if (auto x11 = qw_x11_backend::from(backend)) {
-            qw_output::from(x11->output_create());
-        } else if (auto wayland = qw_wayland_backend::from(backend)) {
-            qw_output::from(wayland->output_create());
-        }
-    }, nullptr);
+    qobject_cast<qw_multi_backend *>(m_backend->handle())
+        ->for_each_backend(
+            [](wlr_backend *backend, void *) {
+                if (auto x11 = qw_x11_backend::from(backend)) {
+                    qw_output::from(x11->output_create());
+                } else if (auto wayland = qw_wayland_backend::from(backend)) {
+                    qw_output::from(wayland->output_create());
+                }
+            },
+            nullptr);
 }
 
 void Helper::setOutputMode(OutputMode mode)
@@ -264,12 +270,15 @@ void Helper::setOutputMode(OutputMode mode)
             m_surfaceContainer->addOutput(o);
             enableOutput(o->output());
         } else { // Copy
-            o = Output::createCopy(m_outputList.at(i)->output(), m_surfaceContainer->primaryOutput(), qmlEngine(), this);
+            o = Output::createCopy(m_outputList.at(i)->output(),
+                                   m_surfaceContainer->primaryOutput(),
+                                   qmlEngine(),
+                                   this);
             m_surfaceContainer->removeOutput(m_outputList.at(i));
         }
 
         m_outputList.at(i)->deleteLater();
-        m_outputList.replace(i,o);
+        m_outputList.replace(i, o);
     }
 }
 

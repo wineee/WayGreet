@@ -5,6 +5,7 @@
 #include "wayconfig.h"
 
 #include <wrenderhelper.h>
+
 #include <qwbuffer.h>
 #include <qwlogging.h>
 
@@ -12,7 +13,8 @@
 
 WAYLIB_SERVER_USE_NAMESPACE
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     qw_log::init(WLR_ERROR);
 
     WRenderHelper::setupRendererBackend();
@@ -24,21 +26,22 @@ int main(int argc, char *argv[]) {
     int quitCode = 0;
     {
         QGuiApplication::setAttribute(Qt::AA_UseOpenGLES);
-        QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+        QGuiApplication::setHighDpiScaleFactorRoundingPolicy(
+            Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
         // QGuiApplication::setQuitOnLastWindowClosed(false);
         QGuiApplication app(argc, argv);
 
         QmlEngine qmlEngine;
 
         QObject::connect(&qmlEngine, &QQmlEngine::quit, &app, &QGuiApplication::quit);
-        QObject::connect(&qmlEngine, &QQmlEngine::exit, &app, [] (int code) {
+        QObject::connect(&qmlEngine, &QQmlEngine::exit, &app, [](int code) {
             qApp->exit(code);
         });
 
-        auto config = qmlEngine.singletonInstance<WayConfig*>("WayGreet", "WayConfig");
+        auto config = qmlEngine.singletonInstance<WayConfig *>("WayGreet", "WayConfig");
         Q_ASSERT(config);
 
-        auto helper = qmlEngine.singletonInstance<Helper*>("WayGreet", "Helper");
+        auto helper = qmlEngine.singletonInstance<Helper *>("WayGreet", "Helper");
         helper->init();
 
         quitCode = app.exec();

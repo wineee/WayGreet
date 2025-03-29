@@ -2,22 +2,22 @@
 // SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 #include "rootsurfacecontainer.h"
+
 #include "helper.h"
 #include "output.h"
 
-#include <woutputlayout.h>
 #include <wcursor.h>
-#include <woutputitem.h>
 #include <woutput.h>
-#include <wxdgsurface.h>
+#include <woutputitem.h>
+#include <woutputlayout.h>
 #include <wxdgpopupsurface.h>
+#include <wxdgsurface.h>
 
 #include <qwoutputlayout.h>
 
 #include <QQuickWindow>
 
 WAYLIB_SERVER_USE_NAMESPACE
-
 
 RootSurfaceContainer::RootSurfaceContainer(QQuickItem *parent)
     : QQuickItem(parent)
@@ -120,7 +120,7 @@ void RootSurfaceContainer::setPrimaryOutput(Output *newPrimaryOutput)
     emit primaryOutputChanged();
 }
 
-const QList<Output*> &RootSurfaceContainer::outputs() const
+const QList<Output *> &RootSurfaceContainer::outputs() const
 {
     return m_outputList;
 }

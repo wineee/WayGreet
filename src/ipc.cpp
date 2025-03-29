@@ -1,8 +1,8 @@
 #include "ipc.h"
 
 #include <QDebug>
-#include <QLocalSocket>
 #include <QJsonDocument>
+#include <QLocalSocket>
 
 // IpcReply
 IpcReply::IpcReply(QObject *parent)
@@ -61,9 +61,12 @@ Ipc::Ipc(QObject *parent)
         qInfo() << "Socket disconnected";
     });
 
-    connect(m_socket, &QLocalSocket::errorOccurred, this, [this](QLocalSocket::LocalSocketError socketError) {
-        qWarning() << "Socket error" << socketError;
-    });
+    connect(m_socket,
+            &QLocalSocket::errorOccurred,
+            this,
+            [this](QLocalSocket::LocalSocketError socketError) {
+                qWarning() << "Socket error" << socketError;
+            });
 
     connect(m_socket, &QLocalSocket::readyRead, this, &Ipc::readyRead);
 }
@@ -122,7 +125,7 @@ void Ipc::readyRead()
         if (m_socket->bytesAvailable() < 4) {
             return;
         }
-        m_socket->read(reinterpret_cast<char*>(&m_length), 4);
+        m_socket->read(reinterpret_cast<char *>(&m_length), 4);
     }
 
     if (m_socket->bytesAvailable() < m_length) {

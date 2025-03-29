@@ -1,4 +1,5 @@
 #include "session.h"
+
 #include "ipc.h"
 
 #include <QDebug>
@@ -38,14 +39,16 @@ void Session::addRequest(IpcReply *reply)
 void Session::replyFinished(IpcReply *reply)
 {
     if (reply->type() == QLatin1String("error")) {
-        qWarning() << reply->requestType() << "error" << reply->errorType() << reply->errorDescription();
+        qWarning() << reply->requestType() << "error" << reply->errorType()
+                   << reply->errorDescription();
         Q_EMIT error(reply->errorType(), reply->errorDescription());
         addRequest(m_ipc->cancelSession());
         return;
     }
 
     if (reply->type() == QLatin1String("success")) {
-        if (reply->requestType() == QLatin1String("create_session") || reply->requestType() == QLatin1String("post_auth_message_response")) {
+        if (reply->requestType() == QLatin1String("create_session")
+            || reply->requestType() == QLatin1String("post_auth_message_response")) {
             addRequest(m_ipc->startSession(m_command));
             return;
         }
@@ -59,7 +62,8 @@ void Session::replyFinished(IpcReply *reply)
     if (reply->type() == QLatin1String("auth_message")) {
         if (reply->authMessageType() == QLatin1String("visible")) {
             qWarning() << "Unhandled visible auth message type!";
-            Q_EMIT error(QStringLiteral("not_implemented"), QStringLiteral("Auth message 'visible' not implemented."));
+            Q_EMIT error(QStringLiteral("not_implemented"),
+                         QStringLiteral("Auth message 'visible' not implemented."));
             addRequest(m_ipc->cancelSession());
         } else if (reply->authMessageType() == QLatin1String("secret")) {
             addRequest(m_ipc->postAuthMessageResponse(m_password));

@@ -22,52 +22,54 @@
 
 #include <QFile>
 #include <QFileInfo>
-#include <QTextStream>
-#include <QSettings>
 #include <QLocale>
 #include <QRegularExpression>
-#include <QtGlobal>
-#include <QtCore/QtGlobal>
+#include <QSettings>
+#include <QTextStream>
 #include <QtCore/QStringView>
+#include <QtCore/QtGlobal>
+#include <QtGlobal>
 
 const QString s_entryExtention = QStringLiteral(".desktop");
 
 // QSettings::IniFormat can't be used to read .desktop files due to different
 // syntax of values (escape sequences, quoting, automatic QStringList detection).
 // So implement yet another .desktop file parser.
-class DesktopFileFormat {
+class DesktopFileFormat
+{
     static bool readFunc(QIODevice &device, QSettings::SettingsMap &map)
     {
         QString filename = QStringLiteral("(unknown)");
-        if(QFile *file = qobject_cast<QFile*>(&device); file)
+        if (QFile *file = qobject_cast<QFile *>(&device); file)
             filename = file->fileName();
 
         QString currentSectionName;
-        for(int lineNumber = 1; !device.atEnd(); lineNumber++)
-        {
+        for (int lineNumber = 1; !device.atEnd(); lineNumber++) {
             // Iterate each line, remove line terminators
             const auto line = device.readLine().replace("\r", "").replace("\n", "");
-            if(line.isEmpty() || line.startsWith('#'))
+            if (line.isEmpty() || line.startsWith('#'))
                 continue; // Ignore empty lines and comments
 
-            if(line.startsWith('[')) // Section header
+            if (line.startsWith('[')) // Section header
             {
                 const int endOfHeader = line.lastIndexOf(']');
-                if(endOfHeader < 0)
-                {
-                    qWarning() << QStringLiteral("%1:%2: Invalid section header").arg(filename).arg(lineNumber);
+                if (endOfHeader < 0) {
+                    qWarning() << QStringLiteral("%1:%2: Invalid section header")
+                                      .arg(filename)
+                                      .arg(lineNumber);
                     return false;
                 }
-                if(endOfHeader != line.length() - 1)
-                    qWarning() << QStringLiteral("%1:%2: Section header does not end line with ]").arg(filename).arg(lineNumber);
+                if (endOfHeader != line.length() - 1)
+                    qWarning() << QStringLiteral("%1:%2: Section header does not end line with ]")
+                                      .arg(filename)
+                                      .arg(lineNumber);
 
                 currentSectionName = QString::fromUtf8(line.mid(1, endOfHeader - 1));
-            }
-            else if(int equalsPos = line.indexOf('='); equalsPos > 0) // Key=Value
+            } else if (int equalsPos = line.indexOf('='); equalsPos > 0) // Key=Value
             {
                 const auto key = QString::fromUtf8(line.left(equalsPos));
 
-                       // Read the value, handle escape sequences
+                // Read the value, handle escape sequences
                 auto valueBytes = line.mid(equalsPos + 1);
                 valueBytes.replace("\\s", " ").replace("\\n", "\n");
                 valueBytes.replace("\\t", "\t").replace("\\r", "\r");
@@ -80,6 +82,7 @@ class DesktopFileFormat {
 
         return true;
     }
+
 public:
     // Register the .desktop file format if necessary, return its id.
     static QSettings::Format format()
@@ -87,7 +90,8 @@ public:
         static QSettings::Format s_format = QSettings::InvalidFormat;
         if (s_format == QSettings::InvalidFormat)
             s_format = QSettings::registerFormat(QStringLiteral("desktop"),
-                                                 DesktopFileFormat::readFunc, nullptr,
+                                                 DesktopFileFormat::readFunc,
+                                                 nullptr,
                                                  Qt::CaseSensitive);
 
         return s_format;
@@ -183,7 +187,8 @@ bool WSession::isNoDisplay() const
     return m_isNoDisplay;
 }
 
-QProcessEnvironment WSession::additionalEnv() const {
+QProcessEnvironment WSession::additionalEnv() const
+{
     return m_additionalEnv;
 }
 
@@ -201,15 +206,16 @@ void WSession::setTo(Type type, const QString &_fileName)
 
     QStringList SessionDirs;
 
-    SessionDirs << "/usr/share/wayland-sessions" << "/nix/store/7yn8psywvnl2b54ny1s9sjfkw0barxg2-desktops/share/wayland-sessions";
+    SessionDirs << "/usr/share/wayland-sessions"
+                << "/nix/store/7yn8psywvnl2b54ny1s9sjfkw0barxg2-desktops/share/wayland-sessions";
 
     switch (type) {
     case WaylandSession:
-        //SessionDirs = mainConfig.Wayland.WSessionDir.get();
+        // SessionDirs = mainConfig.Wayland.WSessionDir.get();
         m_xdgSessionType = QStringLiteral("wayland");
         break;
     case X11Session:
-        //SessionDirs = mainConfig.X11.WSessionDir.get();
+        // SessionDirs = mainConfig.X11.WSessionDir.get();
         m_xdgSessionType = QStringLiteral("x11");
         break;
     default:
@@ -218,7 +224,7 @@ void WSession::setTo(Type type, const QString &_fileName)
     }
 
     QFile file;
-    for (const auto &path: std::as_const(SessionDirs)) {
+    for (const auto &path : std::as_const(SessionDirs)) {
         m_dir.setPath(path);
         m_fileName = m_dir.absoluteFilePath(fileName);
 
@@ -233,7 +239,8 @@ void WSession::setTo(Type type, const QString &_fileName)
 
     QSettings settings(m_fileName, DesktopFileFormat::format());
     QStringList locales = { QLocale().name() };
-    if (auto clean = QLocale().name().remove(QRegularExpression(QLatin1String("_.*"))); clean != locales.constFirst()) {
+    if (auto clean = QLocale().name().remove(QRegularExpression(QLatin1String("_.*")));
+        clean != locales.constFirst()) {
         locales << clean;
     }
 
@@ -242,9 +249,11 @@ void WSession::setTo(Type type, const QString &_fileName)
 
     settings.beginGroup(QLatin1String("Desktop Entry"));
 
-    auto localizedValue = [&] (const QLatin1String &key) {
+    auto localizedValue = [&](const QLatin1String &key) {
         for (QString locale : std::as_const(locales)) {
-            QString localizedValue = settings.value(key + QLatin1Char('[') + locale + QLatin1Char(']'), QString()).toString();
+            QString localizedValue =
+                settings.value(key + QLatin1Char('[') + locale + QLatin1Char(']'), QString())
+                    .toString();
             if (!localizedValue.isEmpty()) {
                 return localizedValue;
             }
@@ -256,7 +265,9 @@ void WSession::setTo(Type type, const QString &_fileName)
     m_comment = localizedValue(QLatin1String("Comment"));
     m_exec = settings.value(QLatin1String("Exec"), QString()).toString();
     m_tryExec = settings.value(QLatin1String("TryExec"), QString()).toString();
-    m_desktopNames = settings.value(QLatin1String("DesktopNames"), QString()).toString().replace(QLatin1Char(';'), QLatin1Char(':'));
+    m_desktopNames = settings.value(QLatin1String("DesktopNames"), QString())
+                         .toString()
+                         .replace(QLatin1Char(';'), QLatin1Char(':'));
     QString hidden = settings.value(QLatin1String("Hidden"), QString()).toString();
     m_isHidden = hidden.toLower() == QLatin1String("true");
     QString noDisplay = settings.value(QLatin1String("NoDisplay"), QString()).toString();
@@ -278,16 +289,14 @@ WSession &WSession::operator=(const WSession &other)
 QProcessEnvironment WSession::parseEnv(const QString &list)
 {
     QProcessEnvironment env;
-    const auto entryList = QStringView{list}.split(u',', Qt::SkipEmptyParts);
-    for (const auto &entry: entryList) {
+    const auto entryList = QStringView{ list }.split(u',', Qt::SkipEmptyParts);
+    for (const auto &entry : entryList) {
         int midPoint = entry.indexOf(QLatin1Char('='));
         if (midPoint < 0) {
             qWarning() << "Malformed entry in" << fileName() << ":" << entry;
             continue;
         }
-        env.insert(entry.left(midPoint).toString(), entry.mid(midPoint+1).toString());
+        env.insert(entry.left(midPoint).toString(), entry.mid(midPoint + 1).toString());
     }
     return env;
 }
-
-

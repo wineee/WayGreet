@@ -27,13 +27,12 @@
 /************************************************/
 /* POWER MANAGER BACKEND                        */
 /************************************************/
-class PowerManagerBackend {
+class PowerManagerBackend
+{
 public:
-    PowerManagerBackend() {
-    }
+    PowerManagerBackend() { }
 
-    virtual ~PowerManagerBackend() {
-    }
+    virtual ~PowerManagerBackend() { }
 
     virtual PowerManager::Capabilities capabilities() const = 0;
 
@@ -52,18 +51,20 @@ const QString UPOWER_PATH = QStringLiteral("/org/freedesktop/UPower");
 const QString UPOWER_SERVICE = QStringLiteral("org.freedesktop.UPower");
 const QString UPOWER_OBJECT = QStringLiteral("org.freedesktop.UPower");
 
-class UPowerBackend : public PowerManagerBackend {
+class UPowerBackend : public PowerManagerBackend
+{
 public:
-    UPowerBackend(const QString & service, const QString & path, const QString & interface) {
+    UPowerBackend(const QString &service, const QString &path, const QString &interface)
+    {
         m_interface = new QDBusInterface(service, path, interface, QDBusConnection::systemBus());
     }
 
-    ~UPowerBackend() {
-        delete m_interface;
-    }
+    ~UPowerBackend() { delete m_interface; }
+
     using Capabilities = PowerManager::Capabilities;
 
-    PowerManager::Capabilities capabilities() const override {
+    PowerManager::Capabilities capabilities() const override
+    {
         Capabilities caps(PowerManager::Capability::PowerOff | PowerManager::Capability::Reboot);
 
         QDBusReply<bool> reply;
@@ -82,33 +83,30 @@ public:
         return caps;
     }
 
-    void powerOff() const override {
+    void powerOff() const override
+    {
         // TODO(rewine): use config
         auto command = QProcess::splitCommand(QString("/usr/bin/systemctl poweroff"));
         const QString program = command.takeFirst();
         QProcess::execute(program, command);
     }
 
-    void reboot() const override {
+    void reboot() const override
+    {
         // TODO(rewine): use config
-        auto command = QProcess::splitCommand(QString( "/usr/bin/systemctl reboot"));
+        auto command = QProcess::splitCommand(QString("/usr/bin/systemctl reboot"));
         const QString program = command.takeFirst();
         QProcess::execute(program, command);
     }
 
-    void suspend() const override {
-        m_interface->call(QStringLiteral("Suspend"));
-    }
+    void suspend() const override { m_interface->call(QStringLiteral("Suspend")); }
 
-    void hibernate() const override {
-        m_interface->call(QStringLiteral("Hibernate"));
-    }
+    void hibernate() const override { m_interface->call(QStringLiteral("Hibernate")); }
 
-    void hybridSleep() const override {
-    }
+    void hybridSleep() const override { }
 
 private:
-    QDBusInterface *m_interface { nullptr };
+    QDBusInterface *m_interface{ nullptr };
 };
 
 /**********************************************/
@@ -123,17 +121,18 @@ const QString CK2_SERVICE = QStringLiteral("org.freedesktop.ConsoleKit");
 const QString CK2_PATH = QStringLiteral("/org/freedesktop/ConsoleKit/Manager");
 const QString CK2_OBJECT = QStringLiteral("org.freedesktop.ConsoleKit.Manager");
 
-class SeatManagerBackend : public PowerManagerBackend {
+class SeatManagerBackend : public PowerManagerBackend
+{
 public:
-    SeatManagerBackend(const QString & service, const QString & path, const QString & interface) {
+    SeatManagerBackend(const QString &service, const QString &path, const QString &interface)
+    {
         m_interface = new QDBusInterface(service, path, interface, QDBusConnection::systemBus());
     }
 
-    ~SeatManagerBackend() {
-        delete m_interface;
-    }
+    ~SeatManagerBackend() { delete m_interface; }
 
-    PowerManager::Capabilities capabilities() const override {
+    PowerManager::Capabilities capabilities() const override
+    {
         PowerManager::Capabilities caps = PowerManager::Capability::None;
 
         QDBusReply<QString> reply;
@@ -167,35 +166,30 @@ public:
         return caps;
     }
 
-    void powerOff() const override {
-        m_interface->call(QStringLiteral("PowerOff"), true);
+    void powerOff() const override { m_interface->call(QStringLiteral("PowerOff"), true); }
+
+    void reboot() const override
+    {
+        // if (!daemonApp->testing())
+        m_interface->call(QStringLiteral("Reboot"), true);
     }
 
-    void reboot() const override{
-        //if (!daemonApp->testing())
-            m_interface->call(QStringLiteral("Reboot"), true);
-    }
+    void suspend() const override { m_interface->call(QStringLiteral("Suspend"), true); }
 
-    void suspend() const override {
-        m_interface->call(QStringLiteral("Suspend"), true);
-    }
+    void hibernate() const override { m_interface->call(QStringLiteral("Hibernate"), true); }
 
-    void hibernate() const override {
-        m_interface->call(QStringLiteral("Hibernate"), true);
-    }
-
-    void hybridSleep() const override {
-        m_interface->call(QStringLiteral("HybridSleep"), true);
-    }
+    void hybridSleep() const override { m_interface->call(QStringLiteral("HybridSleep"), true); }
 
 private:
-    QDBusInterface *m_interface { nullptr };
+    QDBusInterface *m_interface{ nullptr };
 };
 
 /**********************************************/
 /* POWER MANAGER                              */
 /**********************************************/
-PowerManager::PowerManager(QObject *parent) : QObject(parent) {
+PowerManager::PowerManager(QObject *parent)
+    : QObject(parent)
+{
     QDBusConnectionInterface *interface = QDBusConnection::systemBus().interface();
 
     // check if login1 interface exists
@@ -211,25 +205,28 @@ PowerManager::PowerManager(QObject *parent) : QObject(parent) {
         m_backends << new UPowerBackend(UPOWER_SERVICE, UPOWER_PATH, UPOWER_OBJECT);
 }
 
-PowerManager::~PowerManager() {
+PowerManager::~PowerManager()
+{
     while (!m_backends.empty())
         delete m_backends.takeFirst();
 }
 
-PowerManager::Capabilities PowerManager::capabilities() const {
+PowerManager::Capabilities PowerManager::capabilities() const
+{
     Capabilities caps = Capability::None;
 
-    for (PowerManagerBackend *backend: m_backends)
+    for (PowerManagerBackend *backend : m_backends)
         caps |= backend->capabilities();
 
     return caps;
 }
 
-void PowerManager::powerOff() const {
-    //if (daemonApp->testing())
-    //    return;
+void PowerManager::powerOff() const
+{
+    // if (daemonApp->testing())
+    //     return;
 
-    for (PowerManagerBackend *backend: m_backends) {
+    for (PowerManagerBackend *backend : m_backends) {
         if (backend->capabilities() & Capability::PowerOff) {
             backend->powerOff();
             break;
@@ -237,11 +234,12 @@ void PowerManager::powerOff() const {
     }
 }
 
-void PowerManager::reboot() const {
-    //if (daemonApp->testing())
-    //    return;
+void PowerManager::reboot() const
+{
+    // if (daemonApp->testing())
+    //     return;
 
-    for (PowerManagerBackend *backend: m_backends) {
+    for (PowerManagerBackend *backend : m_backends) {
         if (backend->capabilities() & Capability::Reboot) {
             backend->reboot();
             break;
@@ -249,11 +247,12 @@ void PowerManager::reboot() const {
     }
 }
 
-void PowerManager::suspend() const {
-    //if (daemonApp->testing())
-    //    return;
+void PowerManager::suspend() const
+{
+    // if (daemonApp->testing())
+    //     return;
 
-    for (PowerManagerBackend *backend: m_backends) {
+    for (PowerManagerBackend *backend : m_backends) {
         if (backend->capabilities() & Capability::Suspend) {
             backend->suspend();
             break;
@@ -261,11 +260,12 @@ void PowerManager::suspend() const {
     }
 }
 
-void PowerManager::hibernate() const {
-    //if (daemonApp->testing())
-    //    return;
+void PowerManager::hibernate() const
+{
+    // if (daemonApp->testing())
+    //     return;
 
-    for (PowerManagerBackend *backend: m_backends) {
+    for (PowerManagerBackend *backend : m_backends) {
         if (backend->capabilities() & Capability::Hibernate) {
             backend->hibernate();
             break;
@@ -273,11 +273,12 @@ void PowerManager::hibernate() const {
     }
 }
 
-void PowerManager::hybridSleep() const {
-    //if (daemonApp->testing())
-    //    return;
+void PowerManager::hybridSleep() const
+{
+    // if (daemonApp->testing())
+    //     return;
 
-    for (PowerManagerBackend *backend: m_backends) {
+    for (PowerManagerBackend *backend : m_backends) {
         if (backend->capabilities() & Capability::HybridSleep) {
             backend->hybridSleep();
             break;

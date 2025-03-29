@@ -2,12 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0 OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 
 #include "output.h"
+
 #include "helper.h"
 #include "rootsurfacecontainer.h"
 
 #include <woutputitem.h>
-#include <woutputrenderwindow.h>
 #include <woutputlayout.h>
+#include <woutputrenderwindow.h>
 #include <wquicktextureproxy.h>
 
 #include <qwoutputlayout.h>
@@ -18,9 +19,7 @@ Output *Output::createPrimary(WOutput *output, QQmlEngine *engine, QObject *pare
 {
     QQmlComponent delegate(engine, "WayGreet", "PrimaryOutput");
     QObject *obj = delegate.beginCreate(engine->rootContext());
-    delegate.setInitialProperties(obj, {
-        {"forceSoftwareCursor", output->handle()->is_x11()}
-    });
+    delegate.setInitialProperties(obj, { { "forceSoftwareCursor", output->handle()->is_x11() } });
     delegate.completeCreate();
     WOutputItem *outputItem = qobject_cast<WOutputItem *>(obj);
     Q_ASSERT(outputItem);
@@ -34,8 +33,8 @@ Output *Output::createPrimary(WOutput *output, QQmlEngine *engine, QObject *pare
     auto contentItem = Helper::instance()->window()->contentItem();
     outputItem->setParentItem(contentItem);
 
-    //o->m_menuBar = Helper::instance()->qmlEngine()->createMenuBar(outputItem, contentItem);
-    //o->m_menuBar->setZ(RootSurfaceContainer::MenuBarZOrder);
+    // o->m_menuBar = Helper::instance()->qmlEngine()->createMenuBar(outputItem, contentItem);
+    // o->m_menuBar->setZ(RootSurfaceContainer::MenuBarZOrder);
 
     return o;
 }
@@ -43,9 +42,11 @@ Output *Output::createPrimary(WOutput *output, QQmlEngine *engine, QObject *pare
 Output *Output::createCopy(WOutput *output, Output *proxy, QQmlEngine *engine, QObject *parent)
 {
     QQmlComponent delegate(engine, "WayGreet", "CopyOutput");
-    QObject *obj = delegate.createWithInitialProperties({
-                                                         {"targetOutputItem", QVariant::fromValue(proxy->outputItem())},
-                                                         }, engine->rootContext());
+    QObject *obj = delegate.createWithInitialProperties(
+        {
+            { "targetOutputItem", QVariant::fromValue(proxy->outputItem()) },
+        },
+        engine->rootContext());
 
     WOutputItem *outputItem = qobject_cast<WOutputItem *>(obj);
     Q_ASSERT(outputItem);
@@ -60,8 +61,10 @@ Output *Output::createCopy(WOutput *output, Output *proxy, QQmlEngine *engine, Q
     auto contentItem = Helper::instance()->window()->contentItem();
     outputItem->setParentItem(contentItem);
     o->updatePrimaryOutputHardwareLayers();
-    connect(o->m_outputViewport, &WOutputViewport::hardwareLayersChanged,
-            o, &Output::updatePrimaryOutputHardwareLayers);
+    connect(o->m_outputViewport,
+            &WOutputViewport::hardwareLayersChanged,
+            o,
+            &Output::updatePrimaryOutputHardwareLayers);
 
     return o;
 }
@@ -105,7 +108,7 @@ WOutputItem *Output::outputItem() const
 
 void Output::updatePositionFromLayout()
 {
-    WOutputLayout * layout = output()->layout();
+    WOutputLayout *layout = output()->layout();
     Q_ASSERT(layout);
 
     auto *layoutOutput = layout->handle()->get(output()->nativeHandle());
@@ -113,11 +116,12 @@ void Output::updatePositionFromLayout()
     m_item->setPosition(pos);
 }
 
-std::pair<WOutputViewport*, QQuickItem*> Output::getOutputItemProperty()
+std::pair<WOutputViewport *, QQuickItem *> Output::getOutputItemProperty()
 {
-    WOutputViewport *viewportCopy = outputItem()->findChild<WOutputViewport*>({}, Qt::FindDirectChildrenOnly);
+    WOutputViewport *viewportCopy =
+        outputItem()->findChild<WOutputViewport *>({}, Qt::FindDirectChildrenOnly);
     Q_ASSERT(viewportCopy);
-    auto textureProxy = outputItem()->findChild<WQuickTextureProxy*>();
+    auto textureProxy = outputItem()->findChild<WQuickTextureProxy *>();
     Q_ASSERT(textureProxy);
 
     return std::make_pair(viewportCopy, textureProxy);
@@ -126,12 +130,15 @@ std::pair<WOutputViewport*, QQuickItem*> Output::getOutputItemProperty()
 void Output::updatePrimaryOutputHardwareLayers()
 {
     WOutputViewport *viewportPrimary = screenViewport();
-    std::pair<WOutputViewport*, QQuickItem*> copyOutput = getOutputItemProperty();
+    std::pair<WOutputViewport *, QQuickItem *> copyOutput = getOutputItemProperty();
     const auto layers = viewportPrimary->hardwareLayers();
     for (auto layer : layers) {
         if (m_hardwareLayersOfPrimaryOutput.removeOne(layer))
             continue;
-        Helper::instance()->window()->attach(layer, copyOutput.first, viewportPrimary, copyOutput.second);
+        Helper::instance()->window()->attach(layer,
+                                             copyOutput.first,
+                                             viewportPrimary,
+                                             copyOutput.second);
     }
 
     for (auto oldLayer : std::as_const(m_hardwareLayersOfPrimaryOutput)) {

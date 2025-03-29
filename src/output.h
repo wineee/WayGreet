@@ -3,10 +3,11 @@
 #pragma once
 
 #include <wglobal.h>
+#include <woutputviewport.h>
+
 #include <QMargins>
 #include <QObject>
 #include <QQmlComponent>
-#include <woutputviewport.h>
 
 Q_MOC_INCLUDE(<woutputitem.h>)
 
@@ -30,13 +31,13 @@ class Output : public QObject
     Q_PROPERTY(WOutputViewport* screenViewport MEMBER m_outputViewport CONSTANT)
 
 public:
-    enum class Type {
-        Primary,
-        Proxy
-    };
+    enum class Type { Primary, Proxy };
 
     static Output *createPrimary(WOutput *output, QQmlEngine *engine, QObject *parent = nullptr);
-    static Output *createCopy(WOutput *output, Output *proxy, QQmlEngine *engine, QObject *parent = nullptr);
+    static Output *createCopy(WOutput *output,
+                              Output *proxy,
+                              QQmlEngine *engine,
+                              QObject *parent = nullptr);
 
     explicit Output(WOutputItem *output, QObject *parent = nullptr);
     ~Output();
@@ -59,7 +60,7 @@ public Q_SLOTS:
     void updatePrimaryOutputHardwareLayers();
 
 private:
-    std::pair<WOutputViewport*, QQuickItem*> getOutputItemProperty();
+    std::pair<WOutputViewport *, QQuickItem *> getOutputItemProperty();
 
     Type m_type;
     WOutputItem *m_item;
@@ -70,4 +71,4 @@ private:
     QList<WOutputLayer *> m_hardwareLayersOfPrimaryOutput;
 };
 
-Q_DECLARE_OPAQUE_POINTER(WAYLIB_SERVER_NAMESPACE::WOutputItem*)
+Q_DECLARE_OPAQUE_POINTER(WAYLIB_SERVER_NAMESPACE::WOutputItem *)

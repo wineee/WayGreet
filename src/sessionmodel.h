@@ -24,12 +24,12 @@
 #include "sessiontype.h"
 
 #include <QAbstractListModel>
-
 #include <QHash>
 
 class SessionModelPrivate;
 
-class SessionModel : public QAbstractListModel {
+class SessionModel : public QAbstractListModel
+{
     Q_OBJECT
     Q_DISABLE_COPY(SessionModel)
     Q_PROPERTY(int lastIndex READ lastIndex CONSTANT)
@@ -58,7 +58,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
 private:
-    SessionModelPrivate *d { nullptr };
+    SessionModelPrivate *d{ nullptr };
 
     void populate(WSession::Type type, const QStringList &dirPaths);
 };
