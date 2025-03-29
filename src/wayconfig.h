@@ -19,6 +19,13 @@ public:
 
     QUrl background() const;
 
+    bool showX11Session() const;
+    QStringList waylandSessionDir() const;
+    QStringList x11SessionDir() const;
+
+    QString lastSession() const;
+    void setLastSession(const QString &session);
+
 private:
     QSettings *m_config;
 

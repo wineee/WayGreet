@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "sessionmodel.h"
+#include "wayconfig.h"
 
 #include <QFileInfo>
 #include <QVector>
@@ -40,10 +41,9 @@ public:
 SessionModel::SessionModel(QObject *parent) : QAbstractListModel(parent), d(new SessionModelPrivate()) {
     // initial population
     beginResetModel();
-    QStringList SessionDirs;
-    SessionDirs << "/usr/share/wayland-sessions" << "/nix/store/7yn8psywvnl2b54ny1s9sjfkw0barxg2-desktops/share/wayland-sessions";
-    populate(WSession::WaylandSession, SessionDirs);
-    // populate(WSession::X11Session, mainConfig.X11.SessionDir.get());
+    populate(WSession::WaylandSession, WayConfig::instance()->waylandSessionDir());
+    if (WayConfig::instance()->showX11Session())
+        populate(WSession::X11Session, WayConfig::instance()->x11SessionDir());
     endResetModel();
 
    // refresh everytime a file is changed, added or removed
@@ -53,12 +53,14 @@ SessionModel::SessionModel(QObject *parent) : QAbstractListModel(parent), d(new 
         beginResetModel();
         d->sessions.clear();
         d->displayNames.clear();
-        //populate(WSession::WaylandSession, mainConfig.Wayland.SessionDir.get());
-        //populate(WSession::X11Session, mainConfig.X11.SessionDir.get());
+        populate(WSession::WaylandSession, WayConfig::instance()->waylandSessionDir());
+        if (WayConfig::instance()->showX11Session())
+            populate(WSession::X11Session, WayConfig::instance()->x11SessionDir());
         endResetModel();
     });
-    //watcher->addPaths(mainConfig.Wayland.SessionDir.get());
-    //watcher->addPaths(mainConfig.X11.SessionDir.get());
+    watcher->addPaths(WayConfig::instance()->waylandSessionDir());
+    if (WayConfig::instance()->showX11Session())
+        watcher->addPaths(WayConfig::instance()->x11SessionDir());
 }
 
 SessionModel::~SessionModel() {
@@ -80,6 +82,13 @@ QHash<int, QByteArray> SessionModel::roleNames() const {
 
 int SessionModel::lastIndex() const {
     return d->lastIndex;
+}
+
+void SessionModel::setLastIndex(int index) {
+    if (index < 0 || index >= d->sessions.length())
+        return;
+    const auto *session = d->sessions[index];
+    WayConfig::instance()->setLastSession(session->fileName());
 }
 
 int SessionModel::rowCount(const QModelIndex &parent) const {
@@ -158,12 +167,12 @@ void SessionModel::populate(WSession::Type type, const QStringList &dirPaths) {
             delete si;
         }
     }
+
     // find out index of the last session
-    // for (int i = 0; i < d->sessions.size(); ++i) {
-    //     if (d->sessions.at(i)->fileName() == stateConfig.Last.Session.get()) {
-    //         d->lastIndex = i;
-    //         break;
-    //     }
-    // }
-    d->lastIndex = 0;
+    for (int i = 0; i < d->sessions.size(); ++i) {
+        if (d->sessions.at(i)->fileName() == WayConfig::instance()->lastSession()) {
+            d->lastIndex = i;
+            break;
+        }
+    }
 }

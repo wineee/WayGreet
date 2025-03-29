@@ -167,6 +167,9 @@ Item {
         visible: Helper.sessionModel.rowCount() > 1
         KeyNavigation.backtab: shutdown
         KeyNavigation.tab: user_entry
+        onCurrentIndexChanged: {
+            Helper.sessionModel.setLastIndex(currentIndex)
+        }
     }
 
     Rectangle {
