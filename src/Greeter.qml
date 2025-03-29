@@ -118,8 +118,8 @@ Item {
         SimpleButton {
             id: suspend
             text: "suspend"
-            onClicked: WayPowerManager.suspend()
-            //visible: sddm.canSuspend
+            onClicked: PowerManager.suspend()
+            visible: PowerManager.canSuspend()
             KeyNavigation.backtab: loginButton
             KeyNavigation.tab: hibernate
         }
@@ -127,8 +127,8 @@ Item {
         SimpleButton {
             id: hibernate
             text: "hibernate"
-            onClicked: WayPowerManager.hibernate()
-            //visible: sddm.canHibernate
+            onClicked: PowerManager.hibernate()
+            visible: PowerManager.canHibernate()
             KeyNavigation.backtab: suspend
             KeyNavigation.tab: restart
         }
@@ -136,8 +136,8 @@ Item {
         SimpleButton {
             id: restart
             text: "reboot"
-            onClicked: WayPowerManager.reboot()
-            //visible: sddm.canReboot
+            onClicked: PowerManager.reboot()
+            visible: PowerManager.canReboot()
             KeyNavigation.backtab: suspend
             KeyNavigation.tab: shutdown
         }
@@ -145,8 +145,8 @@ Item {
         SimpleButton {
             id: shutdown
             text: "shutdown"
-            onClicked: WayPowerManager.powerOff()
-            //visible: sddm.canPowerOff
+            onClicked: PowerManager.powerOff()
+            visible: PowerManager.canPowerOff()
             KeyNavigation.backtab: restart
             KeyNavigation.tab: session
         }

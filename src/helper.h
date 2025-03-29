@@ -59,6 +59,7 @@ public:
 
     static Helper *instance();
 
+    Q_INVOKABLE bool isTestMode() const;
     SessionModel *sessionModel() const;
     UserModel *userModel() const;
     QmlEngine *qmlEngine() const;
@@ -73,7 +74,7 @@ public:
 
     Q_INVOKABLE void addOutput();
 
-signals:
+Q_SIGNALS:
     void primaryOutputChanged();
     void outputModeChanged();
 
@@ -96,7 +97,6 @@ private:
 
     // Greeter Backends
     Backend *m_greetd = nullptr;
-    PowerManager *m_powerManager = nullptr;
     SessionModel *m_sessionModel = nullptr;
     UserModel *m_userModel = nullptr;
 

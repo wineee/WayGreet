@@ -3,6 +3,7 @@
 
 #include "helper.h"
 #include "wayconfig.h"
+#include "powermanager.h"
 
 #include <wrenderhelper.h>
 
@@ -43,6 +44,9 @@ int main(int argc, char *argv[])
 
         auto helper = qmlEngine.singletonInstance<Helper *>("WayGreet", "Helper");
         helper->init();
+
+        auto powermanager = qmlEngine.singletonInstance<PowerManager *>("WayGreet", "PowerManager");
+        Q_ASSERT(powermanager);
 
         quitCode = app.exec();
     }

@@ -18,6 +18,7 @@
  ***************************************************************************/
 
 #include "powermanager.h"
+#include "helper.h"
 
 #include <QDBusConnectionInterface>
 #include <QDBusInterface>
@@ -217,14 +218,15 @@ PowerManager::Capabilities PowerManager::capabilities() const
 
     for (PowerManagerBackend *backend : m_backends)
         caps |= backend->capabilities();
-
     return caps;
 }
 
 void PowerManager::powerOff() const
 {
-    // if (daemonApp->testing())
-    //     return;
+    if (Helper::instance()->isTestMode()) {
+        qDebug() << "Try powerOff in test mode";
+        return;
+    }
 
     for (PowerManagerBackend *backend : m_backends) {
         if (backend->capabilities() & Capability::PowerOff) {
@@ -236,8 +238,10 @@ void PowerManager::powerOff() const
 
 void PowerManager::reboot() const
 {
-    // if (daemonApp->testing())
-    //     return;
+    if (Helper::instance()->isTestMode()) {
+        qDebug() << "Try reboot in test mode";
+        return;
+    }
 
     for (PowerManagerBackend *backend : m_backends) {
         if (backend->capabilities() & Capability::Reboot) {
@@ -249,8 +253,10 @@ void PowerManager::reboot() const
 
 void PowerManager::suspend() const
 {
-    // if (daemonApp->testing())
-    //     return;
+    if (Helper::instance()->isTestMode()) {
+        qDebug() << "Try suspend in test mode";
+        return;
+    }
 
     for (PowerManagerBackend *backend : m_backends) {
         if (backend->capabilities() & Capability::Suspend) {
@@ -262,8 +268,10 @@ void PowerManager::suspend() const
 
 void PowerManager::hibernate() const
 {
-    // if (daemonApp->testing())
-    //     return;
+    if (Helper::instance()->isTestMode()) {
+        qDebug() << "Try hibernate in test mode";
+        return;
+    }
 
     for (PowerManagerBackend *backend : m_backends) {
         if (backend->capabilities() & Capability::Hibernate) {
@@ -275,8 +283,10 @@ void PowerManager::hibernate() const
 
 void PowerManager::hybridSleep() const
 {
-    // if (daemonApp->testing())
-    //     return;
+    if (Helper::instance()->isTestMode()) {
+        qDebug() << "Try hybridsleep in test mode";
+        return;
+    }
 
     for (PowerManagerBackend *backend : m_backends) {
         if (backend->capabilities() & Capability::HybridSleep) {

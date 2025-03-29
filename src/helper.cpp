@@ -42,7 +42,6 @@ Helper *Helper::m_instance = nullptr;
 Helper::Helper(QObject *parent)
     : WSeatEventFilter(parent)
     , m_greetd(new Backend(this))
-    , m_powerManager(new PowerManager(this))
     , m_sessionModel(new SessionModel(this))
     , m_userModel(new UserModel(true, this))
     , m_renderWindow(new WOutputRenderWindow(this))
@@ -69,6 +68,11 @@ Helper::~Helper()
 Helper *Helper::instance()
 {
     return m_instance;
+}
+
+bool Helper::isTestMode() const
+{
+    return !m_backend->hasDrm();
 }
 
 SessionModel *Helper::sessionModel() const
@@ -98,7 +102,6 @@ void Helper::init()
     engine->setContextForObject(m_renderWindow->contentItem(), engine->rootContext());
     // m_surfaceContainer->setQmlEngine(engine);
     engine->rootContext()->setContextProperty("Greetd", m_greetd);
-    engine->rootContext()->setContextProperty("WayPowerManager", m_powerManager);
 
     m_surfaceContainer->init(m_server);
     m_seat = m_server->attach<WSeat>();

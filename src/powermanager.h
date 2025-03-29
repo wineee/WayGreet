@@ -20,15 +20,18 @@
 
 #include <QObject>
 #include <QVector>
+#include <QQmlEngine>
 
 class PowerManagerBackend;
 
 class PowerManager : public QObject
 {
     Q_OBJECT
-    Q_DISABLE_COPY(PowerManager)
+    QML_ELEMENT
+    QML_SINGLETON
+
 public:
-    PowerManager(QObject *parent = 0);
+    explicit PowerManager(QObject *parent = 0);
     ~PowerManager();
 
     enum Capability {
@@ -39,16 +42,23 @@ public:
         Hibernate = 0x0008,
         HybridSleep = 0x0010
     };
+    Q_ENUMS(Capability);
     Q_DECLARE_FLAGS(Capabilities, Capability)
 
-public slots:
+public Q_SLOTS:
     Capabilities capabilities() const;
 
-    Q_INVOKABLE void powerOff() const;
-    Q_INVOKABLE void reboot() const;
-    Q_INVOKABLE void suspend() const;
-    Q_INVOKABLE void hibernate() const;
-    Q_INVOKABLE void hybridSleep() const;
+    void powerOff() const;
+    void reboot() const;
+    void suspend() const;
+    void hibernate() const;
+    void hybridSleep() const;
+
+    inline bool canPowerOff() const { return capabilities().testFlag(Capability::PowerOff); };
+    inline bool canReboot() const { return capabilities().testFlag(Capability::Reboot); };
+    inline bool canSuspend() const { return capabilities().testFlag(Capability::Suspend); };
+    inline bool canHibernate() const { return capabilities().testFlag(Capability::Hibernate); };
+    inline bool canHybridSleep() const { return capabilities().testFlag(Capability::HybridSleep); };
 
 private:
     QVector<PowerManagerBackend *> m_backends;

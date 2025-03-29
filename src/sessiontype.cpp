@@ -19,6 +19,7 @@
  ***************************************************************************/
 
 #include "sessiontype.h"
+#include "wayconfig.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -26,8 +27,7 @@
 #include <QRegularExpression>
 #include <QSettings>
 #include <QTextStream>
-#include <QtCore/QStringView>
-#include <QtCore/QtGlobal>
+#include <QStringView>
 #include <QtGlobal>
 
 const QString s_entryExtention = QStringLiteral(".desktop");
@@ -206,16 +206,13 @@ void WSession::setTo(Type type, const QString &_fileName)
 
     QStringList SessionDirs;
 
-    SessionDirs << "/usr/share/wayland-sessions"
-                << "/nix/store/7yn8psywvnl2b54ny1s9sjfkw0barxg2-desktops/share/wayland-sessions";
-
     switch (type) {
     case WaylandSession:
-        // SessionDirs = mainConfig.Wayland.WSessionDir.get();
+        SessionDirs = WayConfig::instance()->waylandSessionDir();
         m_xdgSessionType = QStringLiteral("wayland");
         break;
     case X11Session:
-        // SessionDirs = mainConfig.X11.WSessionDir.get();
+        SessionDirs = WayConfig::instance()->x11SessionDir();
         m_xdgSessionType = QStringLiteral("x11");
         break;
     default:

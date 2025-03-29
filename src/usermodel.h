@@ -31,7 +31,6 @@ class UserModel : public QAbstractListModel
     Q_PROPERTY(int lastIndex READ lastIndex CONSTANT)
     Q_PROPERTY(QString lastUser READ lastUser CONSTANT)
     Q_PROPERTY(int count READ rowCount CONSTANT)
-    Q_PROPERTY(int disableAvatarsThreshold READ disableAvatarsThreshold CONSTANT)
     Q_PROPERTY(bool containsAllUsers READ containsAllUsers CONSTANT)
 public:
     enum UserRoles {
@@ -54,7 +53,6 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
-    int disableAvatarsThreshold() const;
     bool containsAllUsers() const;
 
 private:

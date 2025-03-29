@@ -139,11 +139,7 @@ UserModel::UserModel(bool needAllUsers, QObject *parent)
         });
     d->users.erase(newEnd, d->users.end());
 
-    // bool avatarsEnabled = mainConfig.Theme.EnableAvatars.get();
-    // if (avatarsEnabled && mainConfig.Theme.EnableAvatars.isDefault()) {
-    //     if (d->users.count() > mainConfig.Theme.DisableAvatarsThreshold.get())
-    //     avatarsEnabled=false;
-    // }
+    bool avatarsEnabled = true;
 
     // find out index of the last user
     for (int i = 0; i < d->users.size(); ++i) {
@@ -151,7 +147,7 @@ UserModel::UserModel(bool needAllUsers, QObject *parent)
         // if (user->name == stateConfig.Last.User.get())
         //     d->lastIndex = i;
 
-        if (false /*avatarsEnabled*/) {
+        if (avatarsEnabled) {
             const QString userFace = QStringLiteral("%1/.face.icon").arg(user->homeDir);
             const QString systemFace =
                 QStringLiteral("%1/%2.face.icon").arg(facesDir).arg(user->name);
@@ -229,11 +225,6 @@ QVariant UserModel::data(const QModelIndex &index, int role) const
 
     // return empty value
     return QVariant();
-}
-
-int UserModel::disableAvatarsThreshold() const
-{
-    return true; // mainConfig.Theme.DisableAvatarsThreshold.get();
 }
 
 bool UserModel::containsAllUsers() const
