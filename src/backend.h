@@ -4,12 +4,12 @@
 #include <QUrl>
 
 class Ipc;
+class SessionIpc;
 class Session;
 
 class Backend : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QUrl iconsSrc READ iconsSrc CONSTANT)
     Q_PROPERTY(bool sessionInProgress READ sessionInProgress NOTIFY sessionInProgressChanged)
 
 public:
@@ -22,9 +22,7 @@ public:
 
     void setCommand(const QString &command);
 
-    Q_INVOKABLE bool login(const QString &user, const QString &password);
-
-    static Backend *instance();
+    bool login(const QString &user, const QString &password, Session *session);
 
 Q_SIGNALS:
     void userChanged();
@@ -36,8 +34,7 @@ Q_SIGNALS:
     void errorMessage(const QString &message);
 
 private:
-    QUrl m_iconsSrc;
     QString m_command;
     Ipc *m_ipc = nullptr;
-    Session *m_session = nullptr;
+    SessionIpc *m_session = nullptr;
 };

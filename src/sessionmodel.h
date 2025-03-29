@@ -21,7 +21,7 @@
 #ifndef SDDM_SESSIONMODEL_H
 #define SDDM_SESSIONMODEL_H
 
-#include "sessiontype.h"
+#include "session.h"
 
 #include <QAbstractListModel>
 #include <QHash>
@@ -53,6 +53,7 @@ public:
 
     int lastIndex() const;
     Q_INVOKABLE void setLastIndex(int index);
+    Session *get(int indec);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -60,7 +61,7 @@ public:
 private:
     SessionModelPrivate *d{ nullptr };
 
-    void populate(WSession::Type type, const QStringList &dirPaths);
+    void populate(Session::Type type, const QStringList &dirPaths);
 };
 
 #endif // SDDM_SESSIONMODEL_H

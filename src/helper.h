@@ -60,6 +60,8 @@ public:
     static Helper *instance();
 
     Q_INVOKABLE bool isTestMode() const;
+    Q_INVOKABLE bool login(const QString &user, const QString &password, int sessionId);
+
     SessionModel *sessionModel() const;
     UserModel *userModel() const;
     QmlEngine *qmlEngine() const;

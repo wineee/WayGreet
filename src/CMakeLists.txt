@@ -35,9 +35,9 @@ qt_add_qml_module(${TARGET}
         rootsurfacecontainer.h rootsurfacecontainer.cpp
         ipc.h ipc.cpp
         backend.h backend.cpp
-        session.h session.cpp
+        sessionipc.h sessionipc.cpp
         powermanager.h powermanager.cpp
-        sessiontype.h sessiontype.cpp
+        session.h session.cpp
         sessionmodel.h sessionmodel.cpp
         usermodel.h usermodel.cpp
         wayconfig.h wayconfig.cpp

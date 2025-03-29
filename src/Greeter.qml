@@ -70,7 +70,7 @@ Item {
                 border.color: Qt.rgba(1, 1, 1, 0.4)
                 radius: 3
             }
-            onAccepted: Greetd.login(user_entry.getValue(), pw_entry.text) // session.currentIndex
+            onAccepted: Helper.login(user_entry.getValue(), pw_entry.text, session.currentIndex)
             KeyNavigation.backtab: user_entry
             KeyNavigation.tab: loginButton
         }
@@ -79,7 +79,7 @@ Item {
             id: loginButton
             text: "login"
             width: 250
-            onClicked: Greetd.login(user_entry.getValue(), pw_entry.text) // session.currentIndex
+            onClicked: Helper.login(user_entry.getValue(), pw_entry.text, session.currentIndex)
             KeyNavigation.backtab: pw_entry
             KeyNavigation.tab: suspend
         }

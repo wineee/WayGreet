@@ -75,6 +75,13 @@ bool Helper::isTestMode() const
     return !m_backend->hasDrm();
 }
 
+bool Helper::login(const QString &user, const QString &password, int sessionId)
+{
+    auto session = m_sessionModel->get(sessionId);
+    Q_ASSERT(session);
+    return m_greetd->login(user, password, session);
+}
+
 SessionModel *Helper::sessionModel() const
 {
     return m_sessionModel;
