@@ -1,5 +1,7 @@
-#ifndef WAYCONFIG_H
-#define WAYCONFIG_H
+// Copyright (C) 2025 rewine <luhongxu@deepin.org>.
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#pragma once
 
 #include <QObject>
 #include <QQmlEngine>
@@ -44,5 +46,3 @@ private:
 
     inline static WayConfig *m_instance = nullptr;
 };
-
-#endif // WAYCONFIG_H

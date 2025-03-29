@@ -1,3 +1,6 @@
+// Copyright (C) 2025 rewine <luhongxu@deepin.org>.
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "wayconfig.h"
 
 WayConfig::WayConfig(QObject *parent)

@@ -1,3 +1,8 @@
+// Copyright (C) 2025 rewine <luhongxu@deepin.org>
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+// Fork from https://gitlab.com/isseigx/simplicity-sddm-theme
+
 import QtQuick
 import QtQuick.Controls
 

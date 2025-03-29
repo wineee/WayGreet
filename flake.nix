@@ -66,13 +66,14 @@
             {
               imports = [ "${nixpkgs}/nixos/modules/virtualisation/qemu-vm.nix" ];
 
+              #services.displayManager.sddm.enable = true;
               services.greetd.enable = true;
+              programs.regreet.enable = true;
               services.greetd.settings.default_session = {
                 command = "cage -s -mlast -- regreet";
-                #command = "waygreet";
+                # command = "waygreet";
                 user = "greeter";
               };
-              programs.regreet.enable = true;
 
               environment.systemPackages = with pkgs; [
                 foot
