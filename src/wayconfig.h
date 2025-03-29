@@ -32,6 +32,13 @@ public:
     QString lastSession() const;
     void setLastSession(const QString &session);
 
+    QString lastUser() const;
+    void setLastUser(const QString &name);
+
+    int minimumUid() const;
+    int maximumUid() const;
+    QStringList hideUsers() const;
+
 private:
     QSettings *m_config;
 

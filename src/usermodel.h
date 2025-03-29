@@ -29,7 +29,6 @@ class UserModel : public QAbstractListModel
     Q_OBJECT
     Q_DISABLE_COPY(UserModel)
     Q_PROPERTY(int lastIndex READ lastIndex CONSTANT)
-    Q_PROPERTY(QString lastUser READ lastUser CONSTANT)
     Q_PROPERTY(int count READ rowCount CONSTANT)
     Q_PROPERTY(bool containsAllUsers READ containsAllUsers CONSTANT)
 public:
@@ -48,7 +47,6 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
     int lastIndex() const;
-    QString lastUser() const;
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;

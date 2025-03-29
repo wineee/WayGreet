@@ -68,3 +68,29 @@ void WayConfig::setLastSession(const QString &session)
 {
     m_config->setValue("lastSession", session);
 }
+
+QString WayConfig::lastUser() const
+{
+    return m_config->value("lastUser").toString();
+}
+
+void WayConfig::setLastUser(const QString &name)
+{
+    m_config->setValue("lastUser", name);
+}
+
+int WayConfig::minimumUid() const
+{
+    // TODO: read from /etc/login.defs
+    return 1000;
+}
+
+int WayConfig::maximumUid() const
+{
+    return 29999;
+}
+
+QStringList WayConfig::hideUsers() const
+{
+    return m_config->value("hideUsers").toString().split(";");
+}
