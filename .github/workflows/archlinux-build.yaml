@@ -1,0 +1,34 @@
+name: Build on archlinux
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  container:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    steps:
+      - name: Run in container
+        run: |
+          pacman-key --init
+          pacman --noconfirm --noprogressbar -Syu
+      - name: Install dep
+        run: |
+          pacman -Syu --noconfirm --noprogressbar base-devel qt6-base qt6-declarative cmake pkgconfig pixman waylib wayland-protocols wlr-protocols git
+          pacman -Syu --noconfirm --noprogressbar clang ninja make fakeroot
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Configure CMake
+        run: |
+          mkdir -p ${{github.workspace}}/build
+          cmake -B ${{github.workspace}}/build -G Ninja
+      - name: Build
+        # Build your program with the given configuration
+        run: cmake --build ${{github.workspace}}/build
