@@ -1,5 +1,5 @@
-import QtQuick 2.12
-import QtQuick.Controls 2.12
+import QtQuick
+import QtQuick.Controls
 
 ComboBox {
     id: control
@@ -72,6 +72,8 @@ ComboBox {
         implicitHeight: contentItem.implicitHeight
         padding: 1
 
+        height: Math.min(contentItem.implicitHeight, control.Window.height - topMargin - bottomMargin)
+
         contentItem: ListView {
             clip: true
             implicitHeight: contentHeight
@@ -82,7 +84,7 @@ ComboBox {
 
         background: Rectangle {
             border.color: Qt.rgba(1, 1, 1, 0.4)
-            color: Qt.rgba(0, 0, 0, 0.4)
+            color: Qt.rgba(0, 0, 0, 0.5)
         }
     }
 
