@@ -34,7 +34,6 @@ qt_add_qml_module(${TARGET}
         qmlengine.h qmlengine.cpp
         rootsurfacecontainer.h rootsurfacecontainer.cpp
         ipc.h ipc.cpp
-        backend.h backend.cpp
         sessionipc.h sessionipc.cpp
         powermanager.h powermanager.cpp
         session.h session.cpp

@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include "backend.h"
-#include "powermanager.h"
 #include "qmlengine.h"
 #include "sessionmodel.h"
 #include "usermodel.h"
@@ -19,12 +17,8 @@
 WAYLIB_SERVER_BEGIN_NAMESPACE
 class WServer;
 class WOutputRenderWindow;
-class WOutputLayout;
 class WCursor;
 class WBackend;
-class WOutputItem;
-class WOutputViewport;
-class WOutputLayer;
 class WOutput;
 WAYLIB_SERVER_END_NAMESPACE
 
@@ -39,6 +33,8 @@ QW_USE_NAMESPACE
 
 class RootSurfaceContainer;
 class Output;
+class Ipc;
+class SessionIpc;
 
 class Helper : public WSeatEventFilter
 {
@@ -47,6 +43,8 @@ class Helper : public WSeatEventFilter
     Q_PROPERTY(OutputMode outputMode READ outputMode WRITE setOutputMode NOTIFY outputModeChanged FINAL)
     Q_PROPERTY(SessionModel *sessionModel READ sessionModel CONSTANT)
     Q_PROPERTY(UserModel *userModel READ userModel CONSTANT)
+    Q_PROPERTY(bool sessionInProgress READ sessionInProgress NOTIFY sessionInProgressChanged)
+
     QML_ELEMENT
     QML_SINGLETON
 
@@ -61,6 +59,7 @@ public:
 
     Q_INVOKABLE bool isTestMode() const;
     Q_INVOKABLE bool login(const QString &user, const QString &password, int sessionId);
+    bool sessionInProgress() const;
 
     SessionModel *sessionModel() const;
     UserModel *userModel() const;
@@ -80,6 +79,12 @@ Q_SIGNALS:
     void primaryOutputChanged();
     void outputModeChanged();
 
+    void sessionInProgressChanged();
+    void sessionSuccess();
+    void sessionError(const QString &type, const QString &description);
+    void infoMessage(const QString &message);
+    void errorMessage(const QString &message);
+
 private:
     void allowNonDrmOutputAutoChangeMode(WOutput *output);
     void enableOutput(WOutput *output);
@@ -98,9 +103,10 @@ private:
     static Helper *m_instance;
 
     // Greeter Backends
-    Backend *m_greetd = nullptr;
     SessionModel *m_sessionModel = nullptr;
     UserModel *m_userModel = nullptr;
+    Ipc *m_ipc = nullptr;
+    SessionIpc *m_sessionIpc = nullptr;
 
     // qtquick helper
     WOutputRenderWindow *m_renderWindow = nullptr;

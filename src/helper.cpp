@@ -3,6 +3,8 @@
 
 #include "helper.h"
 
+#include "ipc.h"
+#include "sessionipc.h"
 #include "output.h"
 #include "qmlengine.h"
 #include "rootsurfacecontainer.h"
@@ -41,9 +43,9 @@ Helper *Helper::m_instance = nullptr;
 
 Helper::Helper(QObject *parent)
     : WSeatEventFilter(parent)
-    , m_greetd(new Backend(this))
     , m_sessionModel(new SessionModel(this))
     , m_userModel(new UserModel(true, this))
+    , m_ipc(new Ipc(this))
     , m_renderWindow(new WOutputRenderWindow(this))
     , m_server(new WServer(this))
     , m_surfaceContainer(new RootSurfaceContainer(m_renderWindow->contentItem()))
@@ -79,7 +81,46 @@ bool Helper::login(const QString &user, const QString &password, int sessionId)
 {
     auto session = m_sessionModel->get(sessionId);
     Q_ASSERT(session);
-    return m_greetd->login(user, password, session);
+    qDebug() << Q_FUNC_INFO << session->desktopNames() << session->exec();
+
+    if (m_sessionIpc) {
+        qWarning() << "Another session in progress!";
+        return false;
+    }
+
+    m_sessionIpc = new SessionIpc(m_ipc, session, this);
+    m_sessionIpc->setUsername(user);
+    m_sessionIpc->setPassword(password);
+
+    connect(m_sessionIpc, &SessionIpc::success, this, [this]() {
+        qDebug() << "Success";
+        m_sessionIpc = nullptr;
+        Q_EMIT sessionSuccess();
+        Q_EMIT sessionInProgressChanged();
+    });
+
+    connect(m_sessionIpc,
+            &SessionIpc::error,
+            this,
+            [this](const QString &errorType, const QString &description) {
+                qDebug() << "Error" << errorType << description;
+                m_sessionIpc = nullptr;
+                Q_EMIT sessionError(errorType, description);
+                Q_EMIT sessionInProgressChanged();
+            });
+
+    connect(m_sessionIpc, &SessionIpc::infoMessage, this, &Helper::infoMessage);
+    connect(m_sessionIpc, &SessionIpc::errorMessage, this, &Helper::errorMessage);
+
+    m_sessionIpc->start();
+    Q_EMIT sessionInProgressChanged();
+
+    return true;
+}
+
+bool Helper::sessionInProgress() const
+{
+    return m_sessionIpc;
 }
 
 SessionModel *Helper::sessionModel() const
@@ -108,7 +149,6 @@ void Helper::init()
     engine->setContextForObject(m_renderWindow, engine->rootContext());
     engine->setContextForObject(m_renderWindow->contentItem(), engine->rootContext());
     // m_surfaceContainer->setQmlEngine(engine);
-    engine->rootContext()->setContextProperty("Greetd", m_greetd);
 
     m_surfaceContainer->init(m_server);
     m_seat = m_server->attach<WSeat>();
