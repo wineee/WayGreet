@@ -87,13 +87,13 @@ int SessionModel::rowCount(const QModelIndex &parent) const {
 }
 
 QVariant SessionModel::data(const QModelIndex &index, int role) const {
-    if (index.row() < 0 || index.row() >= d->sessions.count())
+    if (!checkIndex(index))
         return QVariant();
 
-           // get session
-    WSession *session = d->sessions[index.row()];
+    // get session
+    const auto *session = d->sessions[index.row()];
 
-           // return correct value
+    // return correct value
     switch (role) {
     case DirectoryRole:
         return session->directory().absolutePath();

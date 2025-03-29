@@ -182,13 +182,13 @@ int UserModel::rowCount(const QModelIndex &parent) const {
 }
 
 QVariant UserModel::data(const QModelIndex &index, int role) const {
-    if (index.row() < 0 || index.row() >= d->users.count())
+    if (!checkIndex(index))
         return QVariant();
 
-           // get user
+    // get user
     UserPtr user = d->users[index.row()];
 
-           // return correct value
+    // return correct value
     if (role == NameRole)
         return user->name;
     else if (role == RealNameRole)
@@ -200,7 +200,7 @@ QVariant UserModel::data(const QModelIndex &index, int role) const {
     else if (role == NeedsPasswordRole)
         return user->needsPassword;
 
-           // return empty value
+    // return empty value
     return QVariant();
 }
 

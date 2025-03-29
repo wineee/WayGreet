@@ -12,7 +12,7 @@
 WAYLIB_SERVER_USE_NAMESPACE
 
 int main(int argc, char *argv[]) {
-    qw_log::init();
+    qw_log::init(WLR_ERROR);
 
     WRenderHelper::setupRendererBackend();
     Q_ASSERT(qw_buffer::get_objects().isEmpty());
