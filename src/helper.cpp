@@ -40,10 +40,6 @@
 #include <QQuickItem>
 #include <QQuickWindow>
 
-#define WLR_FRACTIONAL_SCALE_V1_VERSION 1
-
-Helper *Helper::m_instance = nullptr;
-
 Helper::Helper(QObject *parent)
     : WSeatEventFilter(parent)
     , m_sessionModel(new SessionModel(this))
@@ -189,6 +185,8 @@ void Helper::init()
         const auto o = m_outputList.takeAt(index);
         m_surfaceContainer->removeOutput(o);
         delete o;
+        if (m_outputList.isEmpty() && isTestMode())
+            qApp->quit();
     });
 
     m_server->start();

@@ -16,10 +16,7 @@ WAYLIB_SERVER_BEGIN_NAMESPACE
 class WOutput;
 class WOutputItem;
 class WOutputViewport;
-class WOutputLayout;
 class WOutputLayer;
-class WQuickTextureProxy;
-class WSeat;
 WAYLIB_SERVER_END_NAMESPACE
 
 WAYLIB_SERVER_USE_NAMESPACE
@@ -52,10 +49,6 @@ public:
     QRectF geometry() const;
     WOutputViewport *screenViewport() const;
     void updatePositionFromLayout();
-
-signals:
-    void exclusiveZoneChanged();
-    void moveResizeFinised();
 
 public Q_SLOTS:
     void updatePrimaryOutputHardwareLayers();

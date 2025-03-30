@@ -16,7 +16,7 @@ Item {
     LayoutMirroring.childrenInherit: true
 
     Connections {
-        target: Greetd
+        target: Helper
 
         function onSessionSuccess() {
         }

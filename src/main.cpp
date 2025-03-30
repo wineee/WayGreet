@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
         QGuiApplication::setAttribute(Qt::AA_UseOpenGLES);
         QGuiApplication::setHighDpiScaleFactorRoundingPolicy(
             Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
-        // QGuiApplication::setQuitOnLastWindowClosed(false);
+        QGuiApplication::setQuitOnLastWindowClosed(false);
         QGuiApplication app(argc, argv);
 
         QmlEngine qmlEngine;

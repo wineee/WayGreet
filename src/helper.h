@@ -9,7 +9,6 @@
 #include "usermodel.h"
 
 #include <wglobal.h>
-#include <wqmlcreator.h>
 #include <wseat.h>
 
 #include <QObject>
@@ -26,7 +25,6 @@ WAYLIB_SERVER_END_NAMESPACE
 QW_BEGIN_NAMESPACE
 class qw_renderer;
 class qw_allocator;
-class qw_compositor;
 QW_END_NAMESPACE
 
 WAYLIB_SERVER_USE_NAMESPACE
@@ -101,7 +99,7 @@ private:
                           QObject *,
                           QInputEvent *event) override;
 
-    static Helper *m_instance;
+    inline static Helper *m_instance = nullptr;
 
     // Greeter Backends
     SessionModel *m_sessionModel = nullptr;
