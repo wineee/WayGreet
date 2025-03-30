@@ -118,7 +118,7 @@ Item {
                     MenuItem {
                         text: "Add Output"
                         onClicked: {
-                            Helper.addOutput()
+                            Helper.addFakeOutput()
                         }
                     }
 

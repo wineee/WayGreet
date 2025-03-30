@@ -1,4 +1,5 @@
 // Copyright (C) 2024 UnionTech Software Technology Co., Ltd.
+// Copyright (C) 2025 rewine <luhongxu@deepin.org>
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 #pragma once
@@ -6,6 +7,7 @@
 #include "output.h"
 
 #include <wglobal.h>
+#include <WOutput>
 
 #include <QQuickItem>
 
@@ -18,7 +20,7 @@ WAYLIB_SERVER_END_NAMESPACE
 
 WAYLIB_SERVER_USE_NAMESPACE
 
-class RootSurfaceContainer : public QQuickItem
+class RootContainer : public QQuickItem
 {
     Q_OBJECT
     Q_PROPERTY(WAYLIB_SERVER_NAMESPACE::WOutputLayout *outputLayout READ outputLayout CONSTANT FINAL)
@@ -26,7 +28,10 @@ class RootSurfaceContainer : public QQuickItem
     Q_PROPERTY(Output *primaryOutput READ primaryOutput WRITE setPrimaryOutput NOTIFY primaryOutputChanged FINAL)
 
 public:
-    explicit RootSurfaceContainer(QQuickItem *parent);
+    enum class OutputMode { Copy, Extension };
+    Q_ENUM(OutputMode)
+
+    explicit RootContainer(QQuickItem *parent);
 
     void init(WServer *server);
 
@@ -38,19 +43,32 @@ public:
     void setPrimaryOutput(Output *newPrimaryOutput);
     const QList<Output *> &outputs() const;
 
-    void addOutput(Output *output);
-    void removeOutput(Output *output);
-signals:
+    void enableOutput(WOutput *output);
+    int indexOfOutput(WOutput *output) const;
+    Output *getOutput(WOutput *output) const;
+
+    OutputMode outputMode() const;
+    void setOutputMode(OutputMode mode);
+
+public Q_SLOTS:
+    void onOutputAdded(WOutput *output);
+    void onOutputRemoved(WOutput *output);
+
+Q_SIGNALS:
     void primaryOutputChanged();
-    void moveResizeFinised();
 
 private:
-    void ensureCursorVisible();
+    void addOutput(Output *output);
+    void removeOutput(Output *output);
 
-    WOutputLayout *m_outputLayout = nullptr;
+    void ensureCursorVisible();
+    void allowNonDrmOutputAutoChangeMode(WOutput *output);
+
     QList<Output *> m_outputList;
     QPointer<Output> m_primaryOutput;
+    WOutputLayout *m_outputLayout = nullptr;
     WCursor *m_cursor = nullptr;
+    OutputMode m_mode = OutputMode::Extension;
 };
 
 Q_DECLARE_OPAQUE_POINTER(WAYLIB_SERVER_NAMESPACE::WOutputLayout *)

@@ -8,15 +8,12 @@
 
 #include "ipc.h"
 #include "sessionipc.h"
-#include "output.h"
 #include "qmlengine.h"
-#include "rootsurfacecontainer.h"
+#include "rootcontainer.h"
 
 #include <WBackend>
 #include <WOutput>
 #include <WServer>
-#include <woutputitem.h>
-#include <woutputlayout.h>
 #include <woutputmanagerv1.h>
 #include <woutputrenderwindow.h>
 #include <woutputviewport.h>
@@ -26,7 +23,6 @@
 
 #include <qwallocator.h>
 #include <qwdisplay.h>
-#include <qwlogging.h>
 #include <qwoutput.h>
 #include <qwrenderer.h>
 
@@ -47,16 +43,13 @@ Helper::Helper(QObject *parent)
     , m_ipc(new Ipc(this))
     , m_renderWindow(new WOutputRenderWindow(this))
     , m_server(new WServer(this))
-    , m_surfaceContainer(new RootSurfaceContainer(m_renderWindow->contentItem()))
+    , m_surfaceContainer(new RootContainer(m_renderWindow->contentItem()))
 {
     Q_ASSERT(!m_instance);
     m_instance = this;
 
     m_renderWindow->setColor(Qt::black);
     m_surfaceContainer->setFlag(QQuickItem::ItemIsFocusScope, true);
-#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
-    m_surfaceContainer->setFocusPolicy(Qt::StrongFocus);
-#endif
 }
 
 Helper::~Helper()
@@ -164,30 +157,11 @@ void Helper::init()
         m_seat->detachInputDevice(device);
     });
 
-    connect(m_backend, &WBackend::outputAdded, this, [this](WOutput *output) {
-        allowNonDrmOutputAutoChangeMode(output);
-        Output *o;
-        if (m_mode == OutputMode::Extension || !m_surfaceContainer->primaryOutput()) {
-            o = Output::createPrimary(output, qmlEngine(), this);
-            o->outputItem()->stackBefore(m_surfaceContainer);
-            m_surfaceContainer->addOutput(o);
-        } else if (m_mode == OutputMode::Copy) {
-            o = Output::createCopy(output, m_surfaceContainer->primaryOutput(), qmlEngine(), this);
-        }
+    connect(m_backend, &WBackend::outputAdded,
+            m_surfaceContainer, &RootContainer::onOutputAdded);
 
-        m_outputList.append(o);
-        enableOutput(output);
-    });
-
-    connect(m_backend, &WBackend::outputRemoved, this, [this](WOutput *output) {
-        auto index = indexOfOutput(output);
-        Q_ASSERT(index >= 0);
-        const auto o = m_outputList.takeAt(index);
-        m_surfaceContainer->removeOutput(o);
-        delete o;
-        if (m_outputList.isEmpty() && isTestMode())
-            qApp->quit();
-    });
+    connect(m_backend, &WBackend::outputRemoved,
+            m_surfaceContainer, &RootContainer::onOutputRemoved);
 
     m_server->start();
 
@@ -235,61 +209,7 @@ void Helper::setCursorPosition(const QPointF &position)
     m_seat->setCursorPosition(position);
 }
 
-void Helper::allowNonDrmOutputAutoChangeMode(WOutput *output)
-{
-    output->safeConnect(&qw_output::notify_request_state,
-                        this,
-                        [this](wlr_output_event_request_state *newState) {
-                            if (newState->state->committed & WLR_OUTPUT_STATE_MODE) {
-                                auto output = qobject_cast<qw_output *>(sender());
-                                output->commit_state(newState->state);
-                            }
-                        });
-}
-
-void Helper::enableOutput(WOutput *output)
-{
-    // Enable on default
-    auto qwoutput = output->handle();
-    // Don't care for WOutput::isEnabled, must do WOutput::commit here,
-    // In order to ensure trigger QWOutput::frame signal, WOutputRenderWindow
-    // needs this signal to render next frmae. Because QWOutput::frame signal
-    // maybe emit before WOutputRenderWindow::attach, if no commit here,
-    // WOutputRenderWindow will ignore this ouptut on render.
-    if (!qwoutput->property("_Enabled").toBool()) {
-        qwoutput->setProperty("_Enabled", true);
-        qw_output_state newState;
-
-        if (!qwoutput->handle()->current_mode) {
-            auto mode = qwoutput->preferred_mode();
-            if (mode)
-                newState.set_mode(mode);
-        }
-        newState.set_enabled(true);
-        bool ok = qwoutput->commit_state(newState);
-        Q_ASSERT(ok);
-    }
-}
-
-int Helper::indexOfOutput(WOutput *output) const
-{
-    for (int i = 0; i < m_outputList.size(); i++) {
-        if (m_outputList.at(i)->output() == output)
-            return i;
-    }
-    return -1;
-}
-
-Output *Helper::getOutput(WOutput *output) const
-{
-    for (auto o : std::as_const(m_outputList)) {
-        if (o->output() == output)
-            return o;
-    }
-    return nullptr;
-}
-
-void Helper::addOutput()
+void Helper::addFakeOutput()
 {
     qobject_cast<qw_multi_backend *>(m_backend->handle())
         ->for_each_backend(
@@ -303,37 +223,3 @@ void Helper::addOutput()
             nullptr);
 }
 
-void Helper::setOutputMode(OutputMode mode)
-{
-    if (m_outputList.length() < 2 || m_mode == mode)
-        return;
-
-    m_mode = mode;
-    Q_EMIT outputModeChanged();
-    for (int i = 0; i < m_outputList.size(); i++) {
-        if (m_outputList.at(i) == m_surfaceContainer->primaryOutput())
-            continue;
-
-        Output *o = nullptr;
-        if (mode == OutputMode::Extension) {
-            o = Output::createPrimary(m_outputList.at(i)->output(), qmlEngine(), this);
-            o->outputItem()->stackBefore(m_surfaceContainer);
-            m_surfaceContainer->addOutput(o);
-            enableOutput(o->output());
-        } else { // Copy
-            o = Output::createCopy(m_outputList.at(i)->output(),
-                                   m_surfaceContainer->primaryOutput(),
-                                   qmlEngine(),
-                                   this);
-            m_surfaceContainer->removeOutput(m_outputList.at(i));
-        }
-
-        m_outputList.at(i)->deleteLater();
-        m_outputList.replace(i, o);
-    }
-}
-
-Helper::OutputMode Helper::outputMode() const
-{
-    return m_mode;
-}

@@ -32,7 +32,7 @@ qt_add_qml_module(${TARGET}
         helper.h helper.cpp
         output.h output.cpp
         qmlengine.h qmlengine.cpp
-        rootsurfacecontainer.h rootsurfacecontainer.cpp
+        rootcontainer.h rootcontainer.cpp
         ipc.h ipc.cpp
         sessionipc.h sessionipc.cpp
         powermanager.h powermanager.cpp

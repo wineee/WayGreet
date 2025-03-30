@@ -30,16 +30,15 @@ QW_END_NAMESPACE
 WAYLIB_SERVER_USE_NAMESPACE
 QW_USE_NAMESPACE
 
-class RootSurfaceContainer;
+class RootContainer;
 class Output;
 class Ipc;
 class SessionIpc;
 
 class Helper : public WSeatEventFilter
 {
-    friend class RootSurfaceContainer;
+    friend class RootContainer;
     Q_OBJECT
-    Q_PROPERTY(OutputMode outputMode READ outputMode WRITE setOutputMode NOTIFY outputModeChanged FINAL)
     Q_PROPERTY(SessionModel *sessionModel READ sessionModel CONSTANT)
     Q_PROPERTY(UserModel *userModel READ userModel CONSTANT)
     Q_PROPERTY(bool sessionInProgress READ sessionInProgress NOTIFY sessionInProgressChanged)
@@ -51,9 +50,6 @@ public:
     explicit Helper(QObject *parent = nullptr);
     ~Helper();
 
-    enum class OutputMode { Copy, Extension };
-    Q_ENUM(OutputMode)
-
     static Helper *instance();
 
     Q_INVOKABLE bool isTestMode() const;
@@ -64,19 +60,12 @@ public:
     UserModel *userModel() const;
     QmlEngine *qmlEngine() const;
     WOutputRenderWindow *window() const;
-    Output *output() const;
     void init();
 
-    Output *getOutput(WOutput *output) const;
-
-    OutputMode outputMode() const;
-    void setOutputMode(OutputMode mode);
-
-    Q_INVOKABLE void addOutput();
+    Q_INVOKABLE void addFakeOutput();
 
 Q_SIGNALS:
     void primaryOutputChanged();
-    void outputModeChanged();
 
     void sessionInProgressChanged();
     void sessionSuccess();
@@ -85,11 +74,6 @@ Q_SIGNALS:
     void errorMessage(const QString &message);
 
 private:
-    void allowNonDrmOutputAutoChangeMode(WOutput *output);
-    void enableOutput(WOutput *output);
-
-    int indexOfOutput(WOutput *output) const;
-
     void setCursorPosition(const QPointF &position);
 
     bool beforeDisposeEvent(WSeat *seat, QWindow *watched, QInputEvent *event) override;
@@ -118,10 +102,7 @@ private:
     qw_allocator *m_allocator = nullptr;
 
     // privaet data
-    QList<Output *> m_outputList;
-
-    RootSurfaceContainer *m_surfaceContainer = nullptr;
-    OutputMode m_mode = OutputMode::Extension;
+    RootContainer *m_surfaceContainer = nullptr;
 };
 
-Q_DECLARE_OPAQUE_POINTER(RootSurfaceContainer *)
+Q_DECLARE_OPAQUE_POINTER(RootContainer *)
