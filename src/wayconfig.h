@@ -41,6 +41,9 @@ public:
     int maximumUid() const;
     QStringList hideUsers() const;
 
+    QString powerOffCommand() const;
+    QString rebootCommand() const;
+
 private:
     QSettings *m_config;
 

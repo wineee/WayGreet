@@ -97,3 +97,13 @@ QStringList WayConfig::hideUsers() const
 {
     return m_config->value("hideUsers").toString().split(";");
 }
+
+QString WayConfig::powerOffCommand() const
+{
+    return QStringLiteral("/usr/bin/systemctl poweroff");
+}
+
+QString WayConfig::rebootCommand() const
+{
+    return QStringLiteral("/usr/bin/systemctl reboot");
+}

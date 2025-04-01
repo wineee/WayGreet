@@ -30,7 +30,7 @@ public:
         Hibernate = 0x0008,
         HybridSleep = 0x0010
     };
-    Q_ENUMS(Capability);
+    Q_ENUM(Capability);
     Q_DECLARE_FLAGS(Capabilities, Capability)
 
 public Q_SLOTS:

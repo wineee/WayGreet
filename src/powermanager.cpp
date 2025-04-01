@@ -4,6 +4,7 @@
 
 #include "powermanager.h"
 #include "helper.h"
+#include "wayconfig.h"
 
 #include <QDBusConnectionInterface>
 #include <QDBusInterface>
@@ -65,22 +66,19 @@ public:
         if (reply.isValid() && reply.value())
             caps |= PowerManager::Capability::Hibernate;
 
-        // return capabilities
         return caps;
     }
 
     void powerOff() const override
     {
-        // TODO(rewine): use config
-        auto command = QProcess::splitCommand(QString("/usr/bin/systemctl poweroff"));
+        auto command = QProcess::splitCommand(WayConfig::instance()->powerOffCommand());
         const QString program = command.takeFirst();
         QProcess::execute(program, command);
     }
 
     void reboot() const override
     {
-        // TODO(rewine): use config
-        auto command = QProcess::splitCommand(QString("/usr/bin/systemctl reboot"));
+        auto command = QProcess::splitCommand(WayConfig::instance()->rebootCommand());
         const QString program = command.takeFirst();
         QProcess::execute(program, command);
     }
@@ -148,17 +146,12 @@ public:
         if (reply.isValid() && (reply.value() == QLatin1String("yes")))
             caps |= PowerManager::Capability::HybridSleep;
 
-        // return capabilities
         return caps;
     }
 
     void powerOff() const override { m_interface->call(QStringLiteral("PowerOff"), true); }
 
-    void reboot() const override
-    {
-        // if (!daemonApp->testing())
-        m_interface->call(QStringLiteral("Reboot"), true);
-    }
+    void reboot() const override { m_interface->call(QStringLiteral("Reboot"), true); }
 
     void suspend() const override { m_interface->call(QStringLiteral("Suspend"), true); }
 
