@@ -25,7 +25,9 @@ public:
     explicit QmlEngine(QObject *parent = nullptr);
 
     QQuickItem *createMenuBar(WOutputItem *output, QQuickItem *parent);
+    QQuickItem *createGreeter(WOutputItem *output, QObject *parent);
 
 private:
     QQmlComponent menuBarComponent;
+    QQmlComponent greeterComponent;
 };

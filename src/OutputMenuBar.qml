@@ -3,7 +3,6 @@
 
 import QtQuick
 import QtQuick.Controls
-import Waylib.Server
 import WayGreet
 
 Item {

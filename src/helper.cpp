@@ -16,7 +16,7 @@
 #include <WServer>
 #include <woutputmanagerv1.h>
 #include <woutputrenderwindow.h>
-#include <woutputviewport.h>
+#include <woutputitem.h>
 #include <wquickcursor.h>
 #include <wrenderhelper.h>
 #include <wseat.h>
@@ -43,18 +43,26 @@ Helper::Helper(QObject *parent)
     , m_ipc(new Ipc(this))
     , m_renderWindow(new WOutputRenderWindow(this))
     , m_server(new WServer(this))
-    , m_surfaceContainer(new RootContainer(m_renderWindow->contentItem()))
+    , m_rootContainer(new RootContainer(m_renderWindow->contentItem()))
 {
     Q_ASSERT(!m_instance);
     m_instance = this;
 
     m_renderWindow->setColor(Qt::black);
-    m_surfaceContainer->setFlag(QQuickItem::ItemIsFocusScope, true);
+    m_rootContainer->setFlag(QQuickItem::ItemIsFocusScope, true);
+
+    connect(m_rootContainer, &RootContainer::primaryOutputChanged, this, [this] () {
+        if (!m_greeter) {
+            m_greeter = qmlEngine()->createGreeter(m_rootContainer->primaryOutput()->outputItem(), this);
+        } else {
+            m_greeter->setParentItem(m_rootContainer->primaryOutput()->outputItem());
+        }
+    });
 }
 
 Helper::~Helper()
 {
-    delete m_surfaceContainer;
+    delete m_rootContainer;
     Q_ASSERT(m_instance == this);
     m_instance = nullptr;
 }
@@ -142,10 +150,10 @@ void Helper::init()
     engine->setContextForObject(m_renderWindow->contentItem(), engine->rootContext());
     // m_surfaceContainer->setQmlEngine(engine);
 
-    m_surfaceContainer->init(m_server);
+    m_rootContainer->init(m_server);
     m_seat = m_server->attach<WSeat>();
     m_seat->setEventFilter(this);
-    m_seat->setCursor(m_surfaceContainer->cursor());
+    m_seat->setCursor(m_rootContainer->cursor());
     m_seat->setKeyboardFocusWindow(m_renderWindow);
 
     m_backend = m_server->attach<WBackend>();
@@ -158,10 +166,10 @@ void Helper::init()
     });
 
     connect(m_backend, &WBackend::outputAdded,
-            m_surfaceContainer, &RootContainer::onOutputAdded);
+            m_rootContainer, &RootContainer::onOutputAdded);
 
     connect(m_backend, &WBackend::outputRemoved,
-            m_surfaceContainer, &RootContainer::onOutputRemoved);
+            m_rootContainer, &RootContainer::onOutputRemoved);
 
     m_server->start();
 

@@ -102,7 +102,8 @@ private:
     qw_allocator *m_allocator = nullptr;
 
     // privaet data
-    RootContainer *m_surfaceContainer = nullptr;
+    RootContainer *m_rootContainer = nullptr;
+    QQuickItem *m_greeter = nullptr;
 };
 
 Q_DECLARE_OPAQUE_POINTER(RootContainer *)

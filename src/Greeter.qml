@@ -12,6 +12,8 @@ Item {
     readonly property color backgroundColor: Qt.rgba(0, 0, 0, 0.4)
     readonly property color hoverBackgroundColor: Qt.rgba(0, 0, 0, 0.6)
 
+    anchors.fill: parent
+    anchors.topMargin: Helper.isTestMode ? 30 : 0 // OutputMenuBar
     LayoutMirroring.enabled: Qt.locale().textDirection === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
 
@@ -36,11 +38,6 @@ Item {
         function onErrorMessage(message) {
             console.log(message);
         }
-    }
-
-    Image {
-        anchors.fill: parent
-        source: WayConfig.background
     }
 
     Column {

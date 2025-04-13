@@ -86,8 +86,9 @@ OutputItem {
         color: "#197e4a"
     }
 
-    Greeter {
+    Image {
         anchors.fill: parent
+        source: WayConfig.background
     }
 
     function setTransform(transform) {

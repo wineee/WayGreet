@@ -33,10 +33,10 @@ Output *Output::createPrimary(WOutput *output, QQmlEngine *engine, QObject *pare
     auto contentItem = Helper::instance()->window()->contentItem();
     outputItem->setParentItem(contentItem);
 
-// #ifdef QT_DEBUG
-//     o->m_menuBar = Helper::instance()->qmlEngine()->createMenuBar(outputItem, contentItem);
-//     o->m_menuBar->setZ(999);
-// #endif
+#ifdef QT_DEBUG
+    o->m_menuBar = Helper::instance()->qmlEngine()->createMenuBar(outputItem, contentItem);
+    o->m_menuBar->setZ(999);
+#endif
 
     return o;
 }
