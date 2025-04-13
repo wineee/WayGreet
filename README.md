@@ -14,6 +14,8 @@ user = "greeter"
 
 #### Configuration Example
 
+In "/etc/xdg/dwapp/waygreet.conf":
+
 ```
 [General]
 cursorSize=@Size(24 24)

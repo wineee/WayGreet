@@ -6,9 +6,10 @@
 WayConfig::WayConfig(QObject *parent)
     : QObject{ parent }
 {
-    m_config = new QSettings("WayGreet", "", this); // QSettings::Format::NativeFormat);
-    // "/etc/waygreet.conf"
-    qDebug() << "@@@@@@@@@@@@@@@@@@@@@@@2" << m_config->fileName();
+    m_config = new QSettings("dwapp", "waygreet", this);
+    // $HOME/.config/dwapp/waygreet.conf
+    // for each directory <dir> in $XDG_CONFIG_DIRS: <dir>/dwapp/waygreet.conf
+    qDebug() << "Load config in: " << m_config->fileName();
 
     Q_ASSERT(!m_instance);
     m_instance = this;
