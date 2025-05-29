@@ -1,6 +1,7 @@
 # WayGreet
 
 A simple greeter for greetd, still in develop...
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/wineee/WayGreet)
 
 
 ![screenshot](./dist/screenshot.jpg)
