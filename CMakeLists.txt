@@ -18,3 +18,5 @@ endif()
 include(GNUInstallDirs)
 
 add_subdirectory(src)
+
+install(DIRECTORY themes/ DESTINATION ${CMAKE_INSTALL_DATADIR}/waygreet/themes)
