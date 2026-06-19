@@ -12,6 +12,41 @@
 #include <QQuickItem>
 #include <QStandardPaths>
 #include <QDir>
+#include <QQmlPropertyMap>
+#include <QSettings>
+#include <QQmlContext>
+#include <QFileInfo>
+
+class ThemeConfig : public QQmlPropertyMap
+{
+    Q_OBJECT
+public:
+    explicit ThemeConfig(const QString &confPath, QObject *parent = nullptr)
+        : QQmlPropertyMap(this, parent)
+    {
+        if (QFile::exists(confPath)) {
+            QSettings settings(confPath, QSettings::IniFormat);
+            settings.beginGroup("General");
+            for (const QString &key : settings.childKeys()) {
+                insert(key, settings.value(key));
+            }
+        }
+    }
+
+    Q_INVOKABLE QString stringValue(const QString &key) const {
+        return value(key).toString();
+    }
+    Q_INVOKABLE bool boolValue(const QString &key) const {
+        return value(key).toBool();
+    }
+    Q_INVOKABLE int intValue(const QString &key) const {
+        return value(key).toInt();
+    }
+    Q_INVOKABLE qreal realValue(const QString &key) const {
+        return value(key).toReal();
+    }
+};
+
 
 Q_LOGGING_CATEGORY(qLcQmlEngine, "waygreet.qmlEngine")
 
@@ -41,8 +76,9 @@ QQuickItem *QmlEngine::createGreeter(WOutputItem *output, QObject *parent)
     if (!greeterComponent) {
         greeterComponent = new QQmlComponent(this);
         auto themeName = WayConfig::instance()->theme();
+        QString themePath;
+
         if (!themeName.isEmpty()) {
-            QString themePath;
             auto customThemeDir = WayConfig::instance()->themeDir();
 
             if (!customThemeDir.isEmpty()) {
@@ -53,12 +89,20 @@ QQuickItem *QmlEngine::createGreeter(WOutputItem *output, QObject *parent)
                 QString relPath = QStringLiteral("waygreet/themes/%1/Main.qml").arg(themeName);
                 themePath = QStandardPaths::locate(QStandardPaths::GenericDataLocation, relPath);
             }
+        }
 
-            if (!themePath.isEmpty() && QFile::exists(themePath)) {
+        if (!themePath.isEmpty()) {
+            QFileInfo fi(themePath);
+            QString confPath = fi.dir().filePath("theme.conf");
+            rootContext()->setContextProperty("config", new ThemeConfig(confPath, this));
+
+            if (QFile::exists(themePath)) {
                 greeterComponent->loadUrl(QUrl::fromLocalFile(themePath));
             } else {
                 qCWarning(qLcQmlEngine) << "Theme file not found for:" << themeName << "fallback to default";
             }
+        } else {
+            rootContext()->setContextProperty("config", new ThemeConfig("", this));
         }
 
         if (greeterComponent->isNull() || greeterComponent->isError()) {
@@ -83,3 +127,5 @@ QQuickItem *QmlEngine::createGreeter(WOutputItem *output, QObject *parent)
 
     return item;
 }
+
+#include "qmlengine.moc"

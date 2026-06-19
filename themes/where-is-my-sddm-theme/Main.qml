@@ -7,57 +7,7 @@ import Qt5Compat.GraphicalEffects
 Rectangle {
     id: root
 
-    QtObject {
-        id: config
-        function stringValue(key) {
-            var defaults = {
-                "background": WayConfig.background.toString(),
-                "basicTextColor": "#ffffff",
-                "backgroundFillMode": "aspect",
-                "wrongPasswordBorderRadius": 0,
-                "wrongPasswordBorderColor": "#ff3117",
-                "passwordTextColor": "#ffffff",
-                "passwordCharacter": "*",
-                "passwordInputBackground": "transparent",
-                "passwordInputBorderColor": "#ffffff",
-                "passwordCursorColor": "#ffffff",
-                "font": "monospace",
-                "helpFont": "monospace"
-            }
-            return defaults[key] || ""
-        }
-        function boolValue(key) {
-            var defaults = {
-                "showUserRealNameByDefault": true,
-                "passwordMask": true,
-                "passwordInputCursorVisible": true,
-                "passwordAllowEmpty": false,
-                "cursorBlinkAnimation": true,
-                "showUsersByDefault": true,
-                "showSessionsByDefault": true,
-                "hideCursor": false
-            }
-            return defaults[key] || false
-        }
-        function intValue(key) {
-            var defaults = {
-                "passwordFontSize": 96,
-                "usersFontSize": 48,
-                "sessionsFontSize": 24,
-                "helpFontSize": 18,
-                "blurRadius": 0,
-                "passwordInputRadius": 10,
-                "passwordInputBorderWidth": 0
-            }
-            return defaults[key] || 0
-        }
-        function realValue(key) {
-            var defaults = {
-                "passwordInputWidth": 0.5
-            }
-            return defaults[key] || 0.0
-        }
-    }
+    
 
     width: 640
     height: 480
