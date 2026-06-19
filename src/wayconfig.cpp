@@ -38,8 +38,22 @@ QSize WayConfig::cursorSize() const
     return m_config->value("cursorSize", QSize(24, 24)).toSize();
 }
 
+#include <QFileInfo>
+
+void WayConfig::setThemeOverride(const QString &theme)
+{
+    if (QFileInfo(theme).isDir()) {
+        m_themeOverride = QFileInfo(theme).absoluteFilePath();
+    } else {
+        m_themeOverride = theme;
+    }
+}
+
 QString WayConfig::theme() const
 {
+    if (!m_themeOverride.isEmpty())
+        return m_themeOverride;
+
     m_config->beginGroup("Theme");
     auto themeName = m_config->value("current", "").toString();
     m_config->endGroup();

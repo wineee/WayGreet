@@ -28,6 +28,7 @@ public:
     QSize cursorSize() const;
 
     QString theme() const;
+    void setThemeOverride(const QString &theme);
     QString themeDir() const;
 
     bool showX11Session() const;
@@ -51,4 +52,5 @@ private:
     QSettings *m_config;
 
     inline static WayConfig *m_instance = nullptr;
+    QString m_themeOverride;
 };

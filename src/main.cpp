@@ -11,6 +11,7 @@
 #include <qwlogging.h>
 
 #include <QGuiApplication>
+#include <QCommandLineParser>
 
 WAYLIB_SERVER_USE_NAMESPACE
 
@@ -32,6 +33,16 @@ int main(int argc, char *argv[])
         QGuiApplication::setQuitOnLastWindowClosed(false);
         QGuiApplication app(argc, argv);
 
+        QCommandLineParser parser;
+        parser.setApplicationDescription("Simple Greeter for greetd");
+        parser.addHelpOption();
+        parser.addVersionOption();
+
+        QCommandLineOption themeOption(QStringList() << "t" << "theme", "Theme name or directory to use", "theme");
+        parser.addOption(themeOption);
+
+        parser.process(app);
+
         QmlEngine qmlEngine;
 
         QObject::connect(&qmlEngine, &QQmlEngine::quit, &app, &QGuiApplication::quit);
@@ -41,6 +52,10 @@ int main(int argc, char *argv[])
 
         auto config = qmlEngine.singletonInstance<WayConfig *>("WayGreet", "WayConfig");
         Q_ASSERT(config);
+
+        if (parser.isSet(themeOption)) {
+            config->setThemeOverride(parser.value(themeOption));
+        }
 
         auto helper = qmlEngine.singletonInstance<Helper *>("WayGreet", "Helper");
         helper->init();
