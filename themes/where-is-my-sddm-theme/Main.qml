@@ -9,8 +9,7 @@ Rectangle {
 
     
 
-    width: 640
-    height: 480
+    anchors.fill: parent
 
     readonly property color textColor: config.stringValue("basicTextColor")
     property int currentUsersIndex: Helper.userModel.lastIndex
@@ -182,7 +181,7 @@ Rectangle {
             Image {
                 id: image
                 anchors.fill: parent
-                source: config.stringValue("background")
+                source: config.stringValue("background") || WayConfig.background
                 smooth: true
                 fillMode: bgFillMode()
                 z: 2
@@ -229,7 +228,7 @@ Rectangle {
                 verticalCenter: parent.verticalCenter
                 horizontalCenter: parent.horizontalCenter
             }
-            echoMode: config.boolValue("passwordMask") ? TextInput.Password : null
+            echoMode: config.boolValue("passwordMask") ? TextInput.Password : TextInput.Normal
             color: config.stringValue("passwordTextColor") || textColor
             selectionColor: textColor
             selectedTextColor: "#000000"
