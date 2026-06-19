@@ -26,7 +26,8 @@ public:
     {
         if (QFile::exists(confPath)) {
             QSettings settings(confPath, QSettings::IniFormat);
-            settings.beginGroup("General");
+            // Qt's IniFormat maps [General] section keys to the top level —
+            // do NOT call beginGroup("General"), read childKeys() directly.
             for (const QString &key : settings.childKeys()) {
                 insert(key, settings.value(key));
             }
@@ -37,13 +38,27 @@ public:
         return value(key).toString();
     }
     Q_INVOKABLE bool boolValue(const QString &key) const {
-        return value(key).toBool();
+        QVariant v = value(key);
+        // QSettings::IniFormat stores true/false as plain strings;
+        // QVariant::toBool() does not convert them, so handle explicitly.
+        if (v.typeId() == QMetaType::QString) {
+            const QString s = v.toString().toLower();
+            return s == QStringLiteral("true") || s == QStringLiteral("1") || s == QStringLiteral("yes");
+        }
+        return v.toBool();
     }
     Q_INVOKABLE int intValue(const QString &key) const {
         return value(key).toInt();
     }
     Q_INVOKABLE qreal realValue(const QString &key) const {
-        return value(key).toReal();
+        QVariant v = value(key);
+        // QSettings::IniFormat may store decimal values as strings.
+        if (v.typeId() == QMetaType::QString) {
+            bool ok = false;
+            qreal r = v.toString().toDouble(&ok);
+            return ok ? r : 0.0;
+        }
+        return v.toReal();
     }
 };
 
