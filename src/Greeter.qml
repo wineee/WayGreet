@@ -17,6 +17,11 @@ Item {
     LayoutMirroring.enabled: Qt.locale().textDirection === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
 
+    property real uiScale: {
+        var scale = Math.min(parent.width / 1920.0, parent.height / 1080.0);
+        return Math.max(1.0, Math.round(scale * 10) / 10);
+    }
+
     Connections {
         target: Helper
 
@@ -43,6 +48,7 @@ Item {
     Column {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
+        scale: root.uiScale
         spacing: 10
 
         SimpleComboBox {
@@ -109,9 +115,11 @@ Item {
     Row {
         anchors {
             bottom: parent.bottom
-            bottomMargin: 10
+            bottomMargin: 10 * root.uiScale
             horizontalCenter: parent.horizontalCenter
         }
+        scale: root.uiScale
+        transformOrigin: Item.Bottom
 
         spacing: 5
 
@@ -156,10 +164,12 @@ Item {
         id: session
         anchors {
             left: parent.left
-            leftMargin: 10
+            leftMargin: 10 * root.uiScale
             top: parent.top
-            topMargin: 10
+            topMargin: 10 * root.uiScale
         }
+        scale: root.uiScale
+        transformOrigin: Item.TopLeft
         currentIndex: Helper.sessionModel.lastIndex
         model: Helper.sessionModel
         textRole: "name"
@@ -177,9 +187,11 @@ Item {
         anchors {
             top: parent.top
             right: parent.right
-            topMargin: 10
-            rightMargin: 10
+            topMargin: 10 * root.uiScale
+            rightMargin: 10 * root.uiScale
         }
+        scale: root.uiScale
+        transformOrigin: Item.TopRight
         border.color: Qt.rgba(1, 1, 1, 0.4)
         radius: 3
         color: backgroundColor
