@@ -8,10 +8,23 @@
 #include "sessionmodel.h"
 #include "usermodel.h"
 
+#include <QObject>
+
+#ifndef Q_MOC_RUN
 #include <wglobal.h>
 #include <wseat.h>
+#else
+#define WAYLIB_SERVER_BEGIN_NAMESPACE namespace Waylib { namespace Server {
+#define WAYLIB_SERVER_END_NAMESPACE }}
+#define WAYLIB_SERVER_USE_NAMESPACE using namespace Waylib::Server;
 
-#include <QObject>
+WAYLIB_SERVER_BEGIN_NAMESPACE
+class WSeat;
+class WSurface;
+class WSeatEventFilter : public QObject {};
+WAYLIB_SERVER_END_NAMESPACE
+#endif
+
 #include <QQmlApplicationEngine>
 
 WAYLIB_SERVER_BEGIN_NAMESPACE
