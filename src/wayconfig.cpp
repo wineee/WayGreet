@@ -38,6 +38,22 @@ QSize WayConfig::cursorSize() const
     return m_config->value("cursorSize", QSize(24, 24)).toSize();
 }
 
+QString WayConfig::theme() const
+{
+    m_config->beginGroup("Theme");
+    auto themeName = m_config->value("current", "").toString();
+    m_config->endGroup();
+    return themeName;
+}
+
+QString WayConfig::themeDir() const
+{
+    m_config->beginGroup("Theme");
+    auto dir = m_config->value("themeDir", "").toString();
+    m_config->endGroup();
+    return dir;
+}
+
 bool WayConfig::showX11Session() const
 {
     return m_config->value("showX11Session", false).toBool();

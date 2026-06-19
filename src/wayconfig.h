@@ -27,6 +27,9 @@ public:
     QString cursorTheme() const;
     QSize cursorSize() const;
 
+    QString theme() const;
+    QString themeDir() const;
+
     bool showX11Session() const;
     QStringList waylandSessionDir() const;
     QStringList x11SessionDir() const;

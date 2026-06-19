@@ -29,5 +29,5 @@ public:
 
 private:
     QQmlComponent menuBarComponent;
-    QQmlComponent greeterComponent;
+    QQmlComponent *greeterComponent = nullptr;
 };
